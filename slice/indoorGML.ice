@@ -1,5 +1,5 @@
 // State: PROPOSAL
-module indoorGMLservice{
+module UrbanService{
   struct 3Dposition{
     float x;
     float y;
