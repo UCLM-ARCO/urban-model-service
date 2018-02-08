@@ -1,5 +1,5 @@
 tests:
-	nosetests test
+	nosetests3 test
 
 clean:
 	find -name "*~" | xargs rm -v

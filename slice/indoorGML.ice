@@ -1,12 +1,12 @@
 // State: PROPOSAL
 module UrbanService{
-  struct 3Dposition{
+  struct position3D{
     float x;
     float y;
     float z;
   };
 
-  sequence<3Dposition> LinearRing;
+  sequence<position3D> LinearRing;
 
   struct Surface{
     string id;
@@ -31,25 +31,27 @@ module UrbanService{
     PartialBounded bound;
   };
 
-  sequence<cell> CellSequence;
-  sequence<Surface> SurfaceSequence;
+  sequence<string> CellSequence;
+  sequence<string> SurfaceSequence;
 
-  interface topologyLayer{
-    bool isAdjacentCell(cell referenceCell, cell cellToCheq);
-    bool isConnectedCell(cell referenceCell, cell cellToCheq);
-    bool isAccesibleCell(cell referenceCell, cell cellToCheq);
+  interface TopologyLayer{
+    bool isAdjacentCell(string referenceCellID, string cellToCheqID);
+    bool isConnectedCell(string referenceCellID, string cellToCheqID);
+    bool isAccesibleCell(string referenceCellID, string cellToCheqID);
 
-    CellSequence getAdjacentCells(Cell referenceCell);
-    CellSequence getConnectedCells(Cell referenceCell);
-    CellSequence getAccesibleCells(Cell referenceCell);
+    CellSequence getAdjacentCells(string referenceCellID);
+    CellSequence getConnectedCells(string referenceCellID);
+    CellSequence getAccesibleCells(string referenceCellID);
 
-    Cell getCellofPosition(3Dposition position);
+    string getCellofPosition(position3D position);
 
-    string getUsage(Cell referenceCell);
-    string getHeight(Cell referenceCell);
-    string getName(Cell referenceCell);
+    string getUsage(string referenceCell);
+    string getName(string referenceCell);
+    float getHeight(string referenceCell);
 
-    SurfaceSequence getExits(Cell referenceCell);
-    Surface getEntrance();
+    SurfaceSequence getExits(string referenceCell);
+    string getEntrance();
+
+    string probarProxy(string prueba); //Solo de prueba. Hay que quitarlo
   };
 };
