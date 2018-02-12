@@ -45,11 +45,11 @@ module UrbanService{
 
     string getCellofPosition(position3D position);
 
-    string getUsage(string referenceCell);
-    string getName(string referenceCell);
-    float getHeight(string referenceCell);
+    string getUsage(string referenceCellID);
+    string getName(string referenceCellID);
+    float getHeight(string referenceCellID);
 
-    SurfaceSequence getExits(string referenceCell);
+    SurfaceSequence getExits(string referenceCellID);
     string getEntrance();
 
     string probarProxy(string prueba); //Solo de prueba. Hay que quitarlo
