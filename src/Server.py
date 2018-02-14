@@ -3,6 +3,9 @@
 
 import sys
 import Ice
+import networkx as nx
+import xml.etree.ElementTree as ET
+
 
 Ice.loadSlice('../slice/indoorGML.ice')
 import UrbanService
@@ -15,6 +18,13 @@ class TopologyLayerI(UrbanService.TopologyLayer):
 
 
 class Server(Ice.Application):
+    def __init__(self):
+        # To-do
+        topologyLayer = nx.Graph()
+
+    def loadModel(self):
+        # To-do
+
     def run(self, argv):
         broker = self.communicator()
         servant = TopologyLayerI()

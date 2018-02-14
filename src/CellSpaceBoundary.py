@@ -1,4 +1,4 @@
-class Bound:
+class CellSpaceBoundary:
     def __init__(self, _id, name, usage, geometry):
         self.id = _id
         self.name = name
@@ -6,7 +6,7 @@ class Bound:
         self.geometry = geometry
 
     def __str__(self):
-        return "Bound id: {}".format(self.id)
+        return "CellSpaceBoundary id: {}".format(self.id)
 
     def __repr__(self):
         return str(self)

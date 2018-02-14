@@ -5,7 +5,7 @@ class State:
         self.duality = duality
 
     def __str__(self):
-        return "State id: {}".format(self.id)
+        return self.id
 
     def __repr__(self):
         return str(self)
