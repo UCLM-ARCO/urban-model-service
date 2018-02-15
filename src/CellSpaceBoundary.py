@@ -6,7 +6,7 @@ class CellSpaceBoundary:
         self.geometry = geometry
 
     def __str__(self):
-        return "CellSpaceBoundary id: {}".format(self.id)
+        return self.id
 
     def __repr__(self):
         return str(self)

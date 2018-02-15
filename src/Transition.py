@@ -6,7 +6,7 @@ class Transition:
         self.duality = duality
 
     def __str__(self):
-        return "Transition id: {}".format(self.id)
+        return self.id
 
     def __repr__(self):
         return str(self)

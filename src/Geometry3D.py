@@ -4,7 +4,7 @@ class Geometry3D:
         self.shell = shell
 
     def __str__(self):
-        return "Geometry3D id: {}".format(self.id)
+        return self.id
 
     def __repr__(self):
         return str(self)

@@ -5,7 +5,7 @@ all:
 
 clean:
 	$(RM) *~ proxy.out
-	$(RM) -rf tilescache
+	$(RM) -rf __pycache__
 
 run-server:
 	./Server.py --Ice.Config=Server.config | tee proxy.out

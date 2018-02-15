@@ -201,12 +201,15 @@ class IndoorGMLreader:
 
 filepath = sys.argv[1]
 model = IndoorGMLreader(filepath)
-print(model.CellSpaceBoundarys)
-print(model.CellSpaces)
+# print(model.CellSpaceBoundarys)
+# print(model.CellSpaces)
 # print(len(model.CellSpaces))
+import pprint
+# pprint.pprint(model.CellSpaces, width=1)
+pprint.pprint(model.CellSpaceBoundarys, width=1)
 
 # model.loadSpaceLayer('TOPOLOGY')
-# model.drawLayer('TOPOLOGY')
-model.drawLayer('cober')
+model.drawLayer('TOPOLOGY')
+# model.drawLayer('cober')
 # model.loadSpaceLayer('topo')
 # model.loadSpaceLayer('cober')
