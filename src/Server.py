@@ -6,35 +6,105 @@ import Ice
 import networkx as nx
 import xml.etree.ElementTree as ET
 
+from IndoorGMLreader import IndoorGMLreader
+
 
 Ice.loadSlice('../slice/indoorGML.ice')
 import UrbanService
 
 
 class TopologyLayerI(UrbanService.TopologyLayer):
-    def probarProxy(self, prueba, current=None):
-        print(prueba)
-        return prueba
+    def __init__(self, model):
+        self.model = model
+        self.topologyLayer_graph = self.model.spaceLayers['TOPOLOGY']
+
+    def getCellreference(self, cellID):
+        if cellID in self.model.CellSpaces:
+            return self.model.CellSpaces[cellID]
+        else:
+            raise Exception('Invalid cellID')
+
+    def isConnectedCell(self, referenceCellID, cellToCheqID, current=None):
+        referenceCellSpace = self.getCellreference(referenceCellID)
+        cellSpaceToCheq = self.getCellreference(cellToCheqID)
+
+        referenceCellSpace_duality = referenceCellSpace.duality
+        cellSpaceToCheq_duality = cellSpaceToCheq.duality
+
+        return cellSpaceToCheq_duality in self.topologyLayer_graph.neighbors(referenceCellSpace_duality)
+
+    def isAdjacentCell(self, referenceCellID, cellToCheqID, current=None):
+        referenceCellSpace = self.getCellreference(referenceCellID)
+        cellSpaceToCheq = self.getCellreference(cellToCheqID)
+
+        referenceCellSpaceBoundarys = referenceCellSpace.cellSpaceBoundarys
+        cellSpaceToCheqBoundarys = cellSpaceToCheq.cellSpaceBoundarys
+
+        return any(cellSpaceToCheqBoundary in referenceCellSpaceBoundarys for cellSpaceToCheqBoundary in cellSpaceToCheqBoundarys)
+
+    def getConnectedCells(self, referenceCellID, current=None):
+        connectedCells = []
+        referenceCellSpace = self.getCellreference(referenceCellID)
+        referenceCellSpace_duality = referenceCellSpace.duality
+
+        for neighbor in self.topologyLayer_graph.neighbors(referenceCellSpace_duality):
+            connectedCells.append(
+                self.topologyLayer_graph.nodes[neighbor]['obj'].duality)
+
+        return connectedCells
+
+    def getAdjacentCells(self, referenceCellID, current=None):
+        adjacentCells = []
+
+        for cellToCheqID in self.model.CellSpaces:
+            if self.isAdjacentCell(referenceCellID, cellToCheqID) and cellToCheqID != referenceCellID:
+                adjacentCells.append(cellToCheqID)
+
+        return adjacentCells
+
+    def getUsage(self, referenceCellID, current=None):
+        referenceCellSpace = self.getCellreference(referenceCellID)
+        return referenceCellSpace.usage
+
+    def getName(self, referenceCellID, current=None):
+        referenceCellSpace = self.getCellreference(referenceCellID)
+        return referenceCellSpace.name
+
+    def getHeight(self, referenceCellID, current=None):
+        referenceCellSpace = self.getCellreference(referenceCellID)
+        surfaces = referenceCellSpace.geometry.shell
+        return surfaces[0][0].z - surfaces[len(surfaces) - 1][0].z
+
+    def getExits(self, referenceCellID, current=None):
+        exits = []
+        referenceCellSpace = self.getCellreference(referenceCellID)
+        for cellSpaceBoundary in referenceCellSpace.cellSpaceBoundarys:
+            if(self.model.CellSpaceBoundarys[cellSpaceBoundary].usage == 'Door'):
+                exits.append(cellSpaceBoundary)
+
+        return exits
+
+    def getEntrances(self, current=None):
+        entrances = []
+        for cellSpace_id, cellSpace in self.model.CellSpaces.items():
+            if(cellSpace.usage == 'Entrance'):
+                entrances.append(cellSpace_id)
+        return entrances
 
 
 class Server(Ice.Application):
     def __init__(self):
-        # To-do
-        topologyLayer = nx.Graph()
-
-    def loadModel(self):
-        # To-do
+        self.model = IndoorGMLreader(sys.argv[1])
 
     def run(self, argv):
         broker = self.communicator()
-        servant = TopologyLayerI()
+        servant = TopologyLayerI(self.model)
 
         adapter = broker.createObjectAdapter("TopologyLayerAdapter")
         proxy = adapter.add(servant, broker.stringToIdentity("topologyLayer1"))
 
         print(proxy)
         sys.stdout.flush()
-        print("--------------------------------------")
 
         adapter.activate()
         self.shutdownOnInterrupt()

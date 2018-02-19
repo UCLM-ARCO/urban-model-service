@@ -8,15 +8,16 @@ module UrbanService{
 
   sequence<string> CellSequenceID;
   sequence<string> SurfaceSequenceID;
+  sequence<string> BoundarySequenceID;
 
   interface TopologyLayer{
-    bool isAdjacentCell(string referenceCellID, string cellToCheqID);
     bool isConnectedCell(string referenceCellID, string cellToCheqID);
-    bool isAccesibleCell(string referenceCellID, string cellToCheqID);
+    bool isAdjacentCell(string referenceCellID, string cellToCheqID);
+    //bool isAccesibleCell(string referenceCellID, string cellToCheqID);
 
-    CellSequenceID getAdjacentCells(string referenceCellID);
     CellSequenceID getConnectedCells(string referenceCellID);
-    CellSequenceID getAccesibleCells(string referenceCellID);
+    CellSequenceID getAdjacentCells(string referenceCellID);
+    //CellSequenceID getAccesibleCells(string referenceCellID);
 
     string getCellofPosition(position3D position);
 
@@ -25,8 +26,6 @@ module UrbanService{
     float getHeight(string referenceCellID);
 
     SurfaceSequenceID getExits(string referenceCellID);
-    string getEntrance();
-
-    string probarProxy(string prueba); //Solo de prueba. Hay que quitarlo
+    BoundarySequenceID getEntrances();
   };
 };

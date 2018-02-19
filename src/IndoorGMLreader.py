@@ -128,7 +128,6 @@ class IndoorGMLreader:
         self.spaceLayers = {}
 
         for spaceLayer_id in self.get_SpaceLayers_id():
-            print(spaceLayer_id)
             self.loadSpaceLayer(spaceLayer_id)
 
     def loadSpaceLayer(self, spaceLayer_id):
@@ -197,19 +196,3 @@ class IndoorGMLreader:
             spaceLayers_id.append(node.attrib[ns['id']])
 
         return spaceLayers_id
-
-
-filepath = sys.argv[1]
-model = IndoorGMLreader(filepath)
-# print(model.CellSpaceBoundarys)
-# print(model.CellSpaces)
-# print(len(model.CellSpaces))
-import pprint
-# pprint.pprint(model.CellSpaces, width=1)
-pprint.pprint(model.CellSpaceBoundarys, width=1)
-
-# model.loadSpaceLayer('TOPOLOGY')
-model.drawLayer('TOPOLOGY')
-# model.drawLayer('cober')
-# model.loadSpaceLayer('topo')
-# model.loadSpaceLayer('cober')
