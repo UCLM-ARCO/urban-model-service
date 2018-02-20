@@ -7,6 +7,8 @@ import networkx as nx
 import xml.etree.ElementTree as ET
 
 from IndoorGMLreader import IndoorGMLreader
+from shapely.geometry import Point
+from shapely.geometry.polygon import Polygon
 
 
 Ice.loadSlice('../slice/indoorGML.ice')
@@ -90,6 +92,13 @@ class TopologyLayerI(UrbanService.TopologyLayer):
             if(cellSpace.usage == 'Entrance'):
                 entrances.append(cellSpace_id)
         return entrances
+
+    # def getCellofPosition(self, position, current=None):
+    #     pointToCheck = Point(position.x, position.y, position.z)
+    #
+    #     for cellSpace in self.model.CellSpaces:
+    #         for cellSpace.geometry.shell
+    #         polygonCell = Polygon()
 
 
 class Server(Ice.Application):
