@@ -4,9 +4,14 @@
 import sys
 import re
 import networkx as nx
+import numpy as np
 import matplotlib.pyplot as plt
+import math
 
 from lxml import etree
+from shapely.geometry import Polygon
+from shapely.geometry import Point
+from scipy.spatial import KDTree
 from CellSpaceBoundary import CellSpaceBoundary
 from Geometry3D import Geometry3D
 from CellSpace import CellSpace
@@ -32,7 +37,23 @@ class IndoorGMLreader:
         self.file = _file
         self.loadCellSpaceBoundarys()
         self.loadCellSpaces()
+        self.createKDTree()
         self.loadSpaceLayers()
+
+        #---------------------------------------------------
+        # point = [44, 5.5, 0]
+        point = [37, 5, 0]
+        distances, ndx = self.kdtree.query(point, k=10)
+
+        for n in ndx:
+            cellSpace_id, polygon = self.shapePoligons[(self.kdtree.data[n][0],
+                                                        self.kdtree.data[n][1], self.kdtree.data[n][2])]
+
+            if(polygon.contains(Point(point)) and
+                    np.asarray(polygon.exterior.coords)[0][2] == point[2]):
+                print(cellSpace_id)
+                break
+        #---------------------------------------------------
 
     def loadCellSpaceBoundarys(self):
         self.CellSpaceBoundarys = {}
@@ -72,6 +93,8 @@ class IndoorGMLreader:
 
     def loadCellSpaces(self):
         self.CellSpaces = {}
+        self.shapePoligons = {}
+
         for (event, node) in etree.iterparse(self.file,
                                              tag=ns['CellSpace'],
                                              huge_tree=True):
@@ -122,7 +145,33 @@ class IndoorGMLreader:
             self.CellSpaces[cellSpace_id] = CellSpace(cellSpace_id, cellSpace_name,
                                                       cellSpace_usage, cellSpace_duality, geometry, cellSpaceBoundarys)
 
+            self.addBasePolygonOfCell(surfaces, cellSpace_id)
             node.clear()
+
+    def addBasePolygonOfCell(self, surfaces, cellSpace_id):
+        z_base = math.inf
+        base = None
+        for surface in surfaces:
+            if(all(point.z == surface[0].z for point in surface)):
+                if(surface[0].z < z_base):
+                    z_base = surface[0].z
+                    base = surface
+
+        points = []
+        for point in base:
+            points.append([point.x, point.y, z_base])
+
+        polygon = Polygon(points)
+        centroid = polygon.centroid
+        self.shapePoligons[(centroid.x, centroid.y, z_base)] = [
+            cellSpace_id, polygon]
+
+    def createKDTree(self):
+        points = []
+        for key in self.shapePoligons.keys():
+            points.append(key)
+
+        self.kdtree = KDTree(points)
 
     def loadSpaceLayers(self):
         self.spaceLayers = {}
