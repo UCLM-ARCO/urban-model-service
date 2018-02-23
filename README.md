@@ -6,11 +6,14 @@ NOTA: la interfaz ice aun está en estado PROPOSAL, por lo que no se encuentra a
 
 # Manual de usuario
 Para instalar las dependencias:
+
 - En la raíz del repositorio, hacer "sh install-dependencies.sh"
 
 Para levantar el servicio:
+
 - Si no tienes el repositorio itsi.indoorgml en ~/repos/, debes cambiar la ruta del modelo en el Makefile.
 - En ./src/ hacer "make run-server".
 
 Para realizar las pruebas y comprobar que todo funciona correctamente:
+
 - Hacer "make tests" en la raíz del repositorio.
