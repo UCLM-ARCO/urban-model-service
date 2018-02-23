@@ -40,21 +40,6 @@ class IndoorGMLreader:
         self.createKDTree()
         self.loadSpaceLayers()
 
-        #---------------------------------------------------
-        # point = [44, 5.5, 0]
-        point = [37, 5, 0]
-        distances, ndx = self.kdtree.query(point, k=10)
-
-        for n in ndx:
-            cellSpace_id, polygon = self.shapePoligons[(self.kdtree.data[n][0],
-                                                        self.kdtree.data[n][1], self.kdtree.data[n][2])]
-
-            if(polygon.contains(Point(point)) and
-                    np.asarray(polygon.exterior.coords)[0][2] == point[2]):
-                print(cellSpace_id)
-                break
-        #---------------------------------------------------
-
     def loadCellSpaceBoundarys(self):
         self.CellSpaceBoundarys = {}
         for (event, node) in etree.iterparse(self.file, events=['end'],
@@ -149,22 +134,23 @@ class IndoorGMLreader:
             node.clear()
 
     def addBasePolygonOfCell(self, surfaces, cellSpace_id):
-        z_base = math.inf
-        base = None
+        z_base_coords = math.inf
+        base_surface = None
+
         for surface in surfaces:
             if(all(point.z == surface[0].z for point in surface)):
-                if(surface[0].z < z_base):
-                    z_base = surface[0].z
-                    base = surface
+                if(surface[0].z < z_base_coords):
+                    z_base_coords = surface[0].z
+                    base_surface = surface
 
         points = []
-        for point in base:
-            points.append([point.x, point.y, z_base])
+        for point in base_surface:
+            points.append([point.x, point.y, z_base_coords])
 
-        polygon = Polygon(points)
-        centroid = polygon.centroid
-        self.shapePoligons[(centroid.x, centroid.y, z_base)] = [
-            cellSpace_id, polygon]
+        polygon_cell = Polygon(points)
+        centroid_cell = polygon_cell.centroid
+        self.shapePoligons[(centroid_cell.x, centroid_cell.y, z_base_coords)] = [
+            cellSpace_id, polygon_cell]
 
     def createKDTree(self):
         points = []
@@ -245,3 +231,24 @@ class IndoorGMLreader:
             spaceLayers_id.append(node.attrib[ns['id']])
 
         return spaceLayers_id
+
+    def findCellIDofPointInKDTree(self, position):
+        z_coord_of_position_ground = self.calculateGroundOfPosition(position.z)
+        point = [position.x, position.y, z_coord_of_position_ground]
+        distances, ndx = self.kdtree.query(point, k=10)
+
+        for n in ndx:
+            centroid_cell_coords = self.kdtree.data[n]
+            cellSpace_id, polygon_cell = self.shapePoligons[(centroid_cell_coords[0],
+                                                             centroid_cell_coords[1],
+                                                             centroid_cell_coords[2])]
+
+            polygon_z_coords = np.asarray(polygon_cell.exterior.coords)[0][2]
+            if(polygon_cell.contains(Point(point)) and
+               polygon_z_coords == point[2]):
+                return cellSpace_id
+                break
+        return None
+
+    def calculateGroundOfPosition(self, z_coor):
+        return int(z_coor / 3) * 3
