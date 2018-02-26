@@ -235,7 +235,7 @@ class IndoorGMLreader:
     def findCellIDofPointInKDTree(self, position):
         z_coord_of_position_ground = self.calculateGroundOfPosition(position.z)
         point = [position.x, position.y, z_coord_of_position_ground]
-        distances, ndx = self.kdtree.query(point, k=72)
+        distances, ndx = self.kdtree.query(point, k=len(self.CellSpaces))
 
         for n in ndx:
             centroid_cell_coords = self.kdtree.data[n]
