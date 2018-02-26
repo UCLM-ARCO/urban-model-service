@@ -91,13 +91,13 @@ class ToplogyTests(TestCase):
     #     self.assertEqual(expected_response, response)
 
     def test_the_case_when_it_not_have_adjacents(self):
-        referenceCellID = "CELL_FIRE STAIRS.0"
+        referenceCellID = "CELL_FIRESTAIRS.0"
         expected_response = [""]
         response = self.topologyLayer.getAdjacentCells(referenceCellID)
         self.assertNotEqual(expected_response, response)
 
     def test_the_case_when_it_not_have_connected(self):
-        referenceCellID = "CELL_FIRE STAIRS.0"
+        referenceCellID = "CELL_FIRESTAIRS.0"
         expected_response = [""]
         response = self.topologyLayer.getConnectedCells(referenceCellID)
         self.assertNotEqual(expected_response, response)
@@ -122,8 +122,9 @@ class ToplogyTests(TestCase):
         self.assertEqual(expected_response, response)
 
     def test_the_cell_of_a_position_inside_a_complex_cell(self):
-        position3D = UrbanService.position3D(30, 9, 1)
-        # position3D = UrbanService.position3D(41, 11, 1) #Al final del pasillo derecha
+        # position3D = UrbanService.position3D(30, 9, 1)
+        position3D = UrbanService.position3D(
+            41, 11, 2)  # Al final del pasillo derecha
         expected_response = "CELL_CORRIDOR.0"
         response = self.topologyLayer.getCellofPosition(position3D)
         self.assertEqual(expected_response, response)
@@ -154,12 +155,12 @@ class ToplogyTests(TestCase):
 
     def test_if_the_exit_are_correct(self):
         referenceCellID = "CELL_HALL.8"
-        expected_response = ["CB19713", "CB19716",
-                             "CB34475", "CB19707", "CB19710"]
+        expected_response = ["CB9192", "CB9195",
+                             "CB9198", "CB9201", "CB9189"]
         response = self.topologyLayer.getExits(referenceCellID)
         self.assertCountEqual(expected_response, response)
 
     def test_the_entrances(self):
-        expected_response = ["CELL_HALL.7"]
+        expected_response = ["CELL_HALL.13"]
         response = self.topologyLayer.getEntrances()
         self.assertEqual(expected_response, response)
