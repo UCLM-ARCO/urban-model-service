@@ -7,8 +7,48 @@ module UrbanService{
   };
 
   sequence<string> CellSequenceID;
+  sequence<string> CellSpaceBoundaryID;
   sequence<string> SurfaceSequenceID;
   sequence<string> BoundarySequenceID;
+  sequence<position3D> LinearRing;
+  sequence<LinearRing> LinearRingSequence;
+
+  struct geometry3D{
+    string id;
+    LinearRingSequence surfaces;
+  };
+
+  struct cellSpace{
+    string id;
+    string name;
+    string usage;
+    string duality;
+    geometry3D geometry;
+    CellSpaceBoundaryID cellSpaceBoundarys;
+  };
+
+  struct cellSpaceBoundary{
+    string id;
+    string name;
+    string usage;
+    geometry3D geometry;
+  };
+
+  struct state{
+    string id;
+    string name;
+    string duality;
+  };
+
+  struct transition{
+    string id;
+    string name;
+    float weight;
+    string duality;
+  };
+
+  sequence<cellSpace> CellSequence;
+  sequence<cellSpaceBoundary> CellSpaceBoundarySequence;
 
   interface TopologyLayer{
     bool isConnectedCell(string referenceCellID, string cellToCheqID);
@@ -18,6 +58,9 @@ module UrbanService{
     CellSequenceID getConnectedCells(string referenceCellID);
     CellSequenceID getAdjacentCells(string referenceCellID);
     //CellSequenceID getAccesibleCells(string referenceCellID);
+
+    CellSequence getCells();
+    CellSpaceBoundarySequence getCellSpaceBoundary();
 
     string getCellofPosition(position3D position);
 

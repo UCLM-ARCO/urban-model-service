@@ -12,15 +12,10 @@ from lxml import etree
 from shapely.geometry import Polygon
 from shapely.geometry import Point
 from scipy.spatial import KDTree
-from CellSpaceBoundary import CellSpaceBoundary
-from Geometry3D import Geometry3D
-from CellSpace import CellSpace
-from State import State
-from Transition import Transition
 
 import Ice
-Ice.loadSlice('../slice/indoorGML.ice')
-from UrbanService import position3D
+Ice.loadSlice('../slice/UrbanService.ice')
+import UrbanService
 
 
 ns = {'indoorgml': 'http://www.opengis.net/indoorgml/1.0/core',
@@ -64,13 +59,14 @@ class IndoorGMLreader:
             linearRing = []
             for pos in cellSpaceBoundary_linearRing_node.findall('gml:pos', ns):
                 position = pos.text.split()
-                linearRing.append(position3D(
+                linearRing.append(UrbanService.position3D(
                     float(position[0]),
                     float(position[1]),
                     float(position[2])))
 
-            geometry = Geometry3D(geometry_id, [linearRing])
-            self.CellSpaceBoundarys[cellSpaceBoundary_id] = CellSpaceBoundary(
+            geometry = UrbanService.geometry3D(
+                geometry_id, [linearRing])
+            self.CellSpaceBoundarys[cellSpaceBoundary_id] = UrbanService.cellSpaceBoundary(
                 cellSpaceBoundary_id, cellSpaceBoundary_name,
                 cellSpaceBoundary_usage, geometry)
 
@@ -116,7 +112,7 @@ class IndoorGMLreader:
 
                 for pos in linearRing_node.findall('gml:pos', ns):
                     position = pos.text.split()
-                    linearRing.append(position3D(
+                    linearRing.append(UrbanService.position3D(
                         float(position[0]), float(position[1]), float(position[2])))
 
                 surfaces.append(linearRing)
@@ -126,9 +122,9 @@ class IndoorGMLreader:
                 cellSpaceBoundarys.append(
                     partialboundedByNode.attrib[ns['href']][1:])
 
-            geometry = Geometry3D(geometry_id, surfaces)
-            self.CellSpaces[cellSpace_id] = CellSpace(cellSpace_id, cellSpace_name,
-                                                      cellSpace_usage, cellSpace_duality, geometry, cellSpaceBoundarys)
+            geometry = UrbanService.geometry3D(geometry_id, surfaces)
+            self.CellSpaces[cellSpace_id] = UrbanService.cellSpace(cellSpace_id, cellSpace_name,
+                                                                   cellSpace_usage, cellSpace_duality, geometry, cellSpaceBoundarys)
 
             self.addBasePolygonOfCell(surfaces, cellSpace_id)
             node.clear()
@@ -193,7 +189,7 @@ class IndoorGMLreader:
             if(state_duality_node is not None):
                 state_duality = state_duality_node.attrib[ns['href']][1:]
 
-            state = State(state_id, state_name, state_duality)
+            state = UrbanService.state(state_id, state_name, state_duality)
             graph.add_node(state_id, obj=state)
 
     def loadEdges(self, root, graph):
@@ -214,7 +210,7 @@ class IndoorGMLreader:
             state_ref_1 = connects[0].attrib[ns['href']][1:]
             state_ref_2 = connects[1].attrib[ns['href']][1:]
 
-            transition = Transition(
+            transition = UrbanService.transition(
                 transition_id, transition_name, transition_weight, transition_duality)
             graph.add_edge(state_ref_1, state_ref_2, object=transition)
 

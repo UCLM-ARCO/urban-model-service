@@ -6,7 +6,7 @@ import Ice
 
 from IndoorGMLreader import IndoorGMLreader
 
-Ice.loadSlice('../slice/indoorGML.ice')
+Ice.loadSlice('../slice/UrbanService.ice')
 import UrbanService
 
 
@@ -59,6 +59,12 @@ class TopologyLayerI(UrbanService.TopologyLayer):
 
         return adjacentCells
 
+    def getCells(self, current=None):
+        return list(self.model.CellSpaces.values())
+
+    def getCellSpaceBoundary(self, current=None):
+        return list(self.model.CellSpaceBoundarys.values())
+
     def getUsage(self, referenceCellID, current=None):
         referenceCellSpace = self.getCellreference(referenceCellID)
         return referenceCellSpace.usage
@@ -69,7 +75,7 @@ class TopologyLayerI(UrbanService.TopologyLayer):
 
     def getHeight(self, referenceCellID, current=None):
         referenceCellSpace = self.getCellreference(referenceCellID)
-        surfaces = referenceCellSpace.geometry.shell
+        surfaces = referenceCellSpace.geometry.surfaces
         return surfaces[0][0].z - surfaces[len(surfaces) - 1][0].z
 
     def getExits(self, referenceCellID, current=None):

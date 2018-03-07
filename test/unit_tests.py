@@ -4,7 +4,7 @@
 import Ice
 from unittest import TestCase
 
-Ice.loadSlice('./slice/indoorGML.ice')
+Ice.loadSlice('./slice/UrbanService.ice')
 import UrbanService
 
 
