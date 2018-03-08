@@ -45,10 +45,14 @@ module UrbanService{
     string name;
     float weight;
     string duality;
+    string connectsFrom;
+    string connectsTo;
   };
 
   sequence<cellSpace> CellSequence;
   sequence<cellSpaceBoundary> CellSpaceBoundarySequence;
+  sequence<state>StateSequence;
+  sequence<transition>TransitionSequence;
 
   interface TopologyLayer{
     bool isConnectedCell(string referenceCellID, string cellToCheqID);
@@ -60,7 +64,9 @@ module UrbanService{
     //CellSequenceID getAccesibleCells(string referenceCellID);
 
     CellSequence getCells();
-    CellSpaceBoundarySequence getCellSpaceBoundary();
+    CellSpaceBoundarySequence getCellSpaceBoundarys();
+    StateSequence getStates();
+    TransitionSequence getTransitions();
 
     string getCellofPosition(position3D position);
 

@@ -3,6 +3,7 @@
 
 import sys
 import Ice
+import networkx as nx
 
 from IndoorGMLreader import IndoorGMLreader
 
@@ -62,8 +63,15 @@ class TopologyLayerI(UrbanService.TopologyLayer):
     def getCells(self, current=None):
         return list(self.model.CellSpaces.values())
 
-    def getCellSpaceBoundary(self, current=None):
+    def getCellSpaceBoundarys(self, current=None):
         return list(self.model.CellSpaceBoundarys.values())
+
+    def getStates(self, current=None):
+        return(list(nx.get_node_attributes(self.topologyLayer_graph, 'obj').values()))
+
+    def getTransitions(self, current=None):
+        return(list(data['obj'] for node1, node2,
+                    data in self.topologyLayer_graph.edges(data=True)))
 
     def getUsage(self, referenceCellID, current=None):
         referenceCellSpace = self.getCellreference(referenceCellID)

@@ -211,8 +211,8 @@ class IndoorGMLreader:
             state_ref_2 = connects[1].attrib[ns['href']][1:]
 
             transition = UrbanService.transition(
-                transition_id, transition_name, transition_weight, transition_duality)
-            graph.add_edge(state_ref_1, state_ref_2, object=transition)
+                transition_id, transition_name, transition_weight, transition_duality, state_ref_1, state_ref_2)
+            graph.add_edge(state_ref_1, state_ref_2, obj=transition)
 
     def drawLayer(self, spaceLayer_id):
         nx.draw(self.spaceLayers[spaceLayer_id], with_labels=True)
