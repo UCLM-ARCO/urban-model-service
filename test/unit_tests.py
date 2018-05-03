@@ -164,3 +164,21 @@ class ToplogyTests(TestCase):
         expected_response = ["CELL_HALL.13"]
         response = self.topologyLayer.getEntrances()
         self.assertEqual(expected_response, response)
+
+    def test_PathCellToCell_route(self):
+        expected_response = ['CELL_LABORATORY.11',
+                             'CELL_CORRIDOR.1', 'CELL_HALL.10', 'CELL_OFFICE.8']
+        response = self.topologyLayer.getPathCellToCell(
+            "CELL_LABORATORY.11", "CELL_OFFICE.8")
+        self.assertEqual(expected_response, response)
+
+    def test_PathPositionToPosition(self):
+        position3DFrom = UrbanService.position3D(
+            2, 20, 3.1)  # CELL_LABORATORY.11
+        position3DTo = UrbanService.position3D(
+            42, 5, 3.1)  # CELL_OFFICE.8
+        expected_response = ['CELL_LABORATORY.11',
+                             'CELL_CORRIDOR.1', 'CELL_HALL.10', 'CELL_OFFICE.8']
+        response = self.topologyLayer.getPathPositionToPosition(
+            position3DFrom, position3DTo)
+        self.assertEqual(expected_response, response)

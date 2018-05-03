@@ -105,6 +105,24 @@ class TopologyLayerI(UrbanService.TopologyLayer):
     def getCellofPosition(self, position, current=None):
         return self.model.findCellIDofPointInKDTree(position)
 
+    def getPathCellToCell(self, CellIDfrom, CellIDto, current=None):
+        cellSpaceFrom = self.getCellreference(CellIDfrom).duality
+        cellSpaceTo = self.getCellreference(CellIDto).duality
+
+        nodes = nx.dijkstra_path(
+            self.topologyLayer_graph, cellSpaceFrom, cellSpaceTo)
+
+        result = []
+        for n in nodes:
+            result.append(self.topologyLayer_graph.nodes[n]['obj'].duality)
+
+        return result
+
+    def getPathPositionToPosition(self, positionFrom, positionTo, current=None):
+        cellIDfrom = self.getCellofPosition(positionFrom)
+        cellIDTo = self.getCellofPosition(positionTo)
+        return self.getPathCellToCell(cellIDfrom, cellIDTo)
+
 
 class Server(Ice.Application):
     def __init__(self):

@@ -69,6 +69,8 @@ module UrbanService{
     TransitionSequence getTransitions();
 
     string getCellofPosition(position3D position);
+    CellSequenceID getPathCellToCell(string CellIDfrom, string CellIDto);
+    CellSequenceID getPathPositionToPosition(position3D positionFrom, position3D positionTo);
 
     string getUsage(string referenceCellID);
     string getName(string referenceCellID);
