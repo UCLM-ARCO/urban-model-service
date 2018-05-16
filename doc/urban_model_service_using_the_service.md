@@ -87,23 +87,21 @@ Starting the service
 ====================
 
 To install all the dependencies necessary to start the service:
-  - At the root of the repository, do 'sh install-dependencies.sh''
+  - At the root of the repository, do `sh install-dependencies.sh`
 
-To start the service, it is necessary to have a model of a building according to the standard IndoorGML.
+To start the service, it is necessary to have a model of a building according to the standard IndoorGML. There are two possible options:
+  - **Option 1:** use the model that we provide from the building Institute of Information Technology and Systems of Ciudad Real (Spain). This model is found in `itsi.indoorGML` [repository](https://bitbucket.org/arco_group/itsi.indoorgml/src/master/). If you do not have this repository in `~/repos/`, you must change the model's path in the Makefile.
+  - **Option 2:** use your own model according to the IndoorGML standard. In this case you must change the model's path in the Makefile.
 
-To start the service:
-  - If you do not have the itsi.indoorgml repository in `~/repos/, you must change the model's path in the Makefile.
-  - In ./src/ do `make run-server`.
+Once the route of the model to be used is correctly configured, the service will be executed. To do this, follow the next step:
+  - In `./src/` do `make run-server`.
 
 
 Checking that everything works
 ------------------------------
 
-To perform the tests and check that everything works correctly:
-
-Make "make tests" in the root of the repository.
-
-
+As a support to the development process, a Test-driven development (TDD) approach has been followed, which also allows to verify that the service is working correctly. To do this, follow the next step:
+  - Make `make tests` in the root of the repository.
 
 Running the example
 ===================
