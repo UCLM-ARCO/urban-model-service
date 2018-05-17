@@ -11,6 +11,3 @@ clean:
 
 run-server:
 	./Server.py $(MODEL_FILE) --Ice.Config=Server.config | tee proxy.out
-
-run-example:
-	./example.py

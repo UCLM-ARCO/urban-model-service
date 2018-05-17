@@ -4,7 +4,7 @@
 import Ice
 from unittest import TestCase
 
-Ice.loadSlice('./slice/UrbanService.ice')
+Ice.loadSlice('../slice/UrbanService.ice')
 import UrbanService
 
 
@@ -13,8 +13,11 @@ class ToplogyTests(TestCase):
         broker = Ice.initialize()
         self.addCleanup(broker.destroy)
 
-        with open('./src/proxy.out', 'r') as f:
-            strproxy = f.readline()
+        try:
+            with open('../src/proxy.out', 'r') as f:
+                strproxy = f.readline()
+        except IOError as error:
+            print('Please, first start the service and then run again.')
 
         proxy = broker.stringToProxy(strproxy)
         self.topologyLayer = UrbanService.TopologyLayerPrx.checkedCast(proxy)

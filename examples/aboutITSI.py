@@ -1,0 +1,72 @@
+#!/usr/bin/python3
+# -*- coding: utf-8; mode: python -*-
+
+import sys
+import Ice
+import random
+
+Ice.loadSlice('../slice/UrbanService.ice')
+import UrbanService
+
+
+class AboutITSI(Ice.Application):
+    def run(self, argv):
+        broker = Ice.initialize()
+
+        try:
+            with open('../src/proxy.out', 'r') as f:
+                strproxy = f.readline()
+        except IOError:
+            print('Please, first start the service and then run again.')
+            exit(1)
+
+        proxy = broker.stringToProxy(strproxy)
+        self.topologyLayer = UrbanService.TopologyLayerPrx.checkedCast(proxy)
+
+        self.retrievesInformationAboutBuilfing()
+
+        broker.destroy()
+
+    def retrievesInformationAboutBuilfing(self):
+        random_cells_id = self.getRandomCellsIds()
+        self.getInfoAboutCellFromId(random_cells_id[0])
+        self.checkRelationBetweenCells(random_cells_id)
+        self.calculatePathBetweenCells(random_cells_id)
+
+    def getRandomCellsIds(self):
+        cells = self.topologyLayer.getCells()
+        random_cells = random.sample(cells, 2)
+        random_cells_id = [cell.id for cell in random_cells]
+        for cell_id in random_cells_id:
+            print("Random cell id: " + cell_id)
+
+        return random_cells_id
+
+    def getInfoAboutCellFromId(self, cell_id):
+        cell_usage = self.topologyLayer.getUsage(cell_id)
+        cell_name = self.topologyLayer.getName(cell_id)
+        cell_height = self.topologyLayer.getHeight(cell_id)
+        connceted_cells = self.topologyLayer.getConnectedCells(cell_id)
+        adjacent_cells = self.topologyLayer.getAdjacentCells(cell_id)
+
+        print("Info about cell with ID {}:\n Usage: {}\n Name: {}\n Height: {}\n Connected cells: {}\n Adjacent cells:{}".format(
+            cell_id, cell_usage, cell_name, cell_height, str(connceted_cells), str(adjacent_cells)))
+
+    def checkRelationBetweenCells(self, random_cells_id):
+        is_connected = self.topologyLayer.isConnectedCell(
+            random_cells_id[0], random_cells_id[1])
+        is_adjacent = self.topologyLayer.isAdjacentCell(
+            random_cells_id[0], random_cells_id[1])
+        print("Check if connected cells: {}\nCheck if adjacents cells: {}".format(
+            is_connected, is_adjacent))
+
+    def calculatePathBetweenCells(self, random_cells_id):
+        try:
+            path = self.topologyLayer.getPathCellToCell(
+                random_cells_id[0], random_cells_id[1])
+            print("Path between cells:" + str(path))
+        except Exception:
+            print("No path between cells.")
+
+
+sys.exit(AboutITSI().main(sys.argv))
