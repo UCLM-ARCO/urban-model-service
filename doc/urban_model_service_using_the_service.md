@@ -94,8 +94,11 @@ To start the service, it is necessary to have a model of a building according to
   - **Option 2:** use your own model according to the IndoorGML standard. In this case you must change the model's path in the Makefile.
 
 Once the route of the model to be used is correctly configured, the service will be executed. To do this, follow the next step:
-  - In `./src/` do `make run-server`.
+  - In `./src/` do:
 
+  ```#!shell
+  $ make run-server
+  ```
 
 Checking that everything works
 ------------------------------
@@ -105,3 +108,10 @@ As a support to the development process, a Test-driven development (TDD) approac
 
 Running the example
 ===================
+To execute the example, simply go to the `examples` folder and execute the following command:
+
+```#!shell
+$ make run-aboutITSI
+```
+
+This example consists of a client that shows how some of the main functionalities of the UrbanModelService works by consulting information about the Institute of Information Technology and Systems of Ciudad Real (Spain).
