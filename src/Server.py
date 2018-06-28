@@ -102,6 +102,9 @@ class IgmlLayerI(UrbanService.IgmlLayer):
                 entrances.append(cellSpace_id)
         return entrances
 
+    def getSpaceLayersID(self, current=None):
+        return self.model.get_SpaceLayers_id()
+
     def getCellofPosition(self, position, current=None):
         return self.model.findCellIDofPointInKDTree(position)
 
@@ -130,7 +133,7 @@ class Server(Ice.Application):
 
     def run(self, argv):
         broker = self.communicator()
-        servant = IgmlLayer(self.model)
+        servant = IgmlLayerI(self.model)
 
         adapter = broker.createObjectAdapter("IgmlLayerAdapter")
         proxy = adapter.add(servant, broker.stringToIdentity("IgmlLayer1"))

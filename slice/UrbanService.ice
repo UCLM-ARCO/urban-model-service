@@ -6,6 +6,7 @@ module UrbanService{
     float z;
   };
 
+  sequence<string> SpaceLayersSequenceID;
   sequence<string> CellSequenceID;
   sequence<string> CellSpaceBoundaryID;
   sequence<string> SurfaceSequenceID;
@@ -78,5 +79,7 @@ module UrbanService{
 
     SurfaceSequenceID getExits(string referenceCellID);
     BoundarySequenceID getEntrances();
+
+    SpaceLayersSequenceID getSpaceLayersID();
   };
 };
