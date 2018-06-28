@@ -12,6 +12,7 @@ class IgmlTests(TestCase):
     def setUp(self):
         broker = Ice.initialize()
         self.addCleanup(broker.destroy)
+        self.spaceLayerID = 'TOPOLOGY'
 
         try:
             with open('../src/proxy.out', 'r') as f:
@@ -115,13 +116,15 @@ class IgmlTests(TestCase):
     def test_the_cell_of_a_position_fisrt_floor(self):
         position3D = UrbanService.position3D(37, 5, 2.9)
         expected_response = "CELL_MEETINGROOM.1"
-        response = self.igmlLayer.getCellofPosition(position3D)
+        response = self.igmlLayer.getCellofPosition(
+            self.spaceLayerID, position3D)
         self.assertEqual(expected_response, response)
 
     def test_the_cell_of_a_position_second_floor(self):
         position3D = UrbanService.position3D(37, 5, 3.1)
         expected_response = "CELL_LABORATORY.17"
-        response = self.igmlLayer.getCellofPosition(position3D)
+        response = self.igmlLayer.getCellofPosition(
+            self.spaceLayerID, position3D)
         self.assertEqual(expected_response, response)
 
     def test_the_cell_of_a_position_inside_a_complex_cell(self):
@@ -129,13 +132,15 @@ class IgmlTests(TestCase):
         position3D = UrbanService.position3D(
             41, 11, 2)  # Al final del pasillo derecha
         expected_response = "CELL_CORRIDOR.0"
-        response = self.igmlLayer.getCellofPosition(position3D)
+        response = self.igmlLayer.getCellofPosition(
+            self.spaceLayerID, position3D)
         self.assertEqual(expected_response, response)
 
     def test_the_cell_of_a_position_outside_model(self):
         position3D = UrbanService.position3D(37, 5, 8.9)
         expected_response = ""
-        response = self.igmlLayer.getCellofPosition(position3D)
+        response = self.igmlLayer.getCellofPosition(
+            self.spaceLayerID, position3D)
         self.assertEqual(expected_response, response)
 
     def test_the_usage_of_a_cell(self):
@@ -165,14 +170,14 @@ class IgmlTests(TestCase):
 
     def test_the_entrances(self):
         expected_response = ["CELL_HALL.13"]
-        response = self.igmlLayer.getEntrances()
+        response = self.igmlLayer.getEntrances(self.spaceLayerID)
         self.assertEqual(expected_response, response)
 
     def test_PathCellToCell_route(self):
         expected_response = ['CELL_LABORATORY.11',
                              'CELL_CORRIDOR.1', 'CELL_HALL.10', 'CELL_OFFICE.8']
-        response = self.igmlLayer.getPathCellToCell(
-            "CELL_LABORATORY.11", "CELL_OFFICE.8")
+        response = self.igmlLayer.getPathCellToCell(self.spaceLayerID,
+                                                    "CELL_LABORATORY.11", "CELL_OFFICE.8")
         self.assertEqual(expected_response, response)
 
     def test_PathPositionToPosition(self):
@@ -182,8 +187,8 @@ class IgmlTests(TestCase):
             42, 5, 3.1)  # CELL_OFFICE.8
         expected_response = ['CELL_LABORATORY.11',
                              'CELL_CORRIDOR.1', 'CELL_HALL.10', 'CELL_OFFICE.8']
-        response = self.igmlLayer.getPathPositionToPosition(
-            position3DFrom, position3DTo)
+        response = self.igmlLayer.getPathPositionToPosition(self.spaceLayerID,
+                                                            position3DFrom, position3DTo)
         self.assertEqual(expected_response, response)
 
     # To-Do

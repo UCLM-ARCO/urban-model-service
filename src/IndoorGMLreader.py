@@ -228,7 +228,7 @@ class IndoorGMLreader:
 
         return spaceLayers_id
 
-    def findCellIDofPointInKDTree(self, position):
+    def findCellIDofPointInKDTree(self, spaceLayerID, position):
         z_coord_of_position_ground = self.calculateGroundOfPosition(position.z)
         point = [position.x, position.y, z_coord_of_position_ground]
         distances, ndx = self.kdtree.query(point, k=len(self.CellSpaces))
@@ -240,7 +240,7 @@ class IndoorGMLreader:
                                                              centroid_cell_coords[2])]
 
             polygon_z_coords = np.asarray(polygon_cell.exterior.coords)[0][2]
-            if(polygon_cell.contains(Point(point)) and
+            if(spaceLayerID == self.getLayerOfaCell(cellSpace_id) and polygon_cell.contains(Point(point)) and
                polygon_z_coords == point[2]):
                 return cellSpace_id
                 break
@@ -248,3 +248,24 @@ class IndoorGMLreader:
 
     def calculateGroundOfPosition(self, z_coor):
         return int(z_coor / 3) * 3
+
+    def getCellreference(self, cellID):
+        if cellID in self.CellSpaces:
+            return self.CellSpaces[cellID]
+        else:
+            raise Exception('Invalid cellID')
+
+    def getLayerOfaCell(self, cellID):
+        cellSpace = self.getCellreference(cellID)
+        cellSpace_duality = cellSpace.duality
+
+        for spaceLayerId in self.get_SpaceLayers_id():
+            self.igmlLayer_graph = self.spaceLayers[spaceLayerId]
+
+            if(cellSpace_duality in self.igmlLayer_graph.nodes):
+                return spaceLayerId
+
+    def getLayerOfaBoundary(self, cellSpaceBoundaryID):
+        for cellToCheq in self.CellSpaces.values():
+            if(cellSpaceBoundaryID in cellToCheq.cellSpaceBoundarys):
+                return self.getLayerOfaCell(cellToCheq.id)

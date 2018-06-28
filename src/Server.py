@@ -14,26 +14,47 @@ import UrbanService
 class IgmlLayerI(UrbanService.IgmlLayer):
     def __init__(self, model):
         self.model = model
-        self.igmlLayer_graph = self.model.spaceLayers['TOPOLOGY']
 
-    def getCellreference(self, cellID):
-        if cellID in self.model.CellSpaces:
-            return self.model.CellSpaces[cellID]
-        else:
-            raise Exception('Invalid cellID')
+    # def getCellreference(self, cellID):
+    #     if cellID in self.model.CellSpaces:
+    #         return self.model.CellSpaces[cellID]
+    #     else:
+    #         raise Exception('Invalid cellID')
+
+    # def getCellSpaceBoundaryreference(self, cellSpaceBoundaryID):
+    #     if cellSpaceBoundaryID in self.model.CellSpaceBoundarys:
+    #         return self.model.CellSpaceBoundarys[cellSpaceBoundaryID]
+    #     else:
+    #         raise Exception('Invalid cellSpaceBoundaryID')
+    #
+    # def getLayerOfaCell(self, cellID):
+    #     cellSpace = self.model.getCellreference(cellID)
+    #     cellSpace_duality = cellSpace.duality
+    #
+    #     for spaceLayerId in self.model.get_SpaceLayers_id():
+    #         self.igmlLayer_graph = self.model.spaceLayers[spaceLayerId]
+    #
+    #         if(cellSpace_duality in self.igmlLayer_graph.nodes):
+    #             return spaceLayerId
+
+    # def self.model.getLayerOfaBoundary(self, cellSpaceBoundaryID):
+    #     for cellToCheq in self.model.CellSpaces.values():
+    #         if(cellSpaceBoundaryID in cellToCheq.cellSpaceBoundarys):
+    #             return self.model.getLayerOfaCell(cellToCheq.id)
 
     def isConnectedCell(self, referenceCellID, cellToCheqID, current=None):
-        referenceCellSpace = self.getCellreference(referenceCellID)
-        cellSpaceToCheq = self.getCellreference(cellToCheqID)
+        spaceLayerID = self.model.getLayerOfaCell(referenceCellID)
+        referenceCellSpace = self.model.getCellreference(referenceCellID)
+        cellSpaceToCheq = self.model.getCellreference(cellToCheqID)
 
         referenceCellSpace_duality = referenceCellSpace.duality
         cellSpaceToCheq_duality = cellSpaceToCheq.duality
 
-        return cellSpaceToCheq_duality in self.igmlLayer_graph.neighbors(referenceCellSpace_duality)
+        return cellSpaceToCheq_duality in self.model.spaceLayers[spaceLayerID].neighbors(referenceCellSpace_duality)
 
     def isAdjacentCell(self, referenceCellID, cellToCheqID, current=None):
-        referenceCellSpace = self.getCellreference(referenceCellID)
-        cellSpaceToCheq = self.getCellreference(cellToCheqID)
+        referenceCellSpace = self.model.getCellreference(referenceCellID)
+        cellSpaceToCheq = self.model.getCellreference(cellToCheqID)
 
         referenceCellSpaceBoundarys = referenceCellSpace.cellSpaceBoundarys
         cellSpaceToCheqBoundarys = cellSpaceToCheq.cellSpaceBoundarys
@@ -42,12 +63,13 @@ class IgmlLayerI(UrbanService.IgmlLayer):
 
     def getConnectedCells(self, referenceCellID, current=None):
         connectedCells = []
-        referenceCellSpace = self.getCellreference(referenceCellID)
+        spaceLayerID = self.model.getLayerOfaCell(referenceCellID)
+        referenceCellSpace = self.model.getCellreference(referenceCellID)
         referenceCellSpace_duality = referenceCellSpace.duality
 
-        for neighbor in self.igmlLayer_graph.neighbors(referenceCellSpace_duality):
+        for neighbor in self.model.spaceLayers[spaceLayerID].neighbors(referenceCellSpace_duality):
             connectedCells.append(
-                self.igmlLayer_graph.nodes[neighbor]['obj'].duality)
+                self.model.spaceLayers[spaceLayerID].nodes[neighbor]['obj'].duality)
 
         return connectedCells
 
@@ -60,71 +82,84 @@ class IgmlLayerI(UrbanService.IgmlLayer):
 
         return adjacentCells
 
-    def getCells(self, current=None):
-        return list(self.model.CellSpaces.values())
+    def getCells(self, spaceLayerID, current=None):
+        cells = []
 
-    def getCellSpaceBoundarys(self, current=None):
-        return list(self.model.CellSpaceBoundarys.values())
+        for cellToCheq in self.model.CellSpaces.values():
+            if(self.model.getLayerOfaCell(cellToCheq.id) == spaceLayerID):
+                cells.append(cellToCheq)
 
-    def getStates(self, current=None):
-        return(list(nx.get_node_attributes(self.igmlLayer_graph, 'obj').values()))
+        return cells
 
-    def getTransitions(self, current=None):
+    def getCellSpaceBoundarys(self, spaceLayerID, current=None):
+        cellSpaceBoundarys = []
+
+        for cellSpaceBoundary in self.model.CellSpaceBoundarys.values():
+            if(self.self.model.getLayerOfaBoundary(cellSpaceBoundary.id) == spaceLayerID):
+                cellSpaceBoundarys.append(cellSpaceBoundary)
+
+        return cellSpaceBoundarys
+
+    def getStates(self, spaceLayerID, current=None):
+        return(list(nx.get_node_attributes(self.model.spaceLayers[spaceLayerID], 'obj').values()))
+
+    def getTransitions(self, spaceLayerID, current=None):
         return(list(data['obj'] for node1, node2,
-                    data in self.igmlLayer_graph.edges(data=True)))
+                    data in self.model.spaceLayers[spaceLayerID].edges(data=True)))
 
     def getUsage(self, referenceCellID, current=None):
-        referenceCellSpace = self.getCellreference(referenceCellID)
+        referenceCellSpace = self.model.getCellreference(referenceCellID)
         return referenceCellSpace.usage
 
     def getName(self, referenceCellID, current=None):
-        referenceCellSpace = self.getCellreference(referenceCellID)
+        referenceCellSpace = self.model.getCellreference(referenceCellID)
         return referenceCellSpace.name
 
     def getHeight(self, referenceCellID, current=None):
-        referenceCellSpace = self.getCellreference(referenceCellID)
+        referenceCellSpace = self.model.getCellreference(referenceCellID)
         surfaces = referenceCellSpace.geometry.surfaces
         return surfaces[0][0].z - surfaces[len(surfaces) - 1][0].z
 
     def getExits(self, referenceCellID, current=None):
         exits = []
-        referenceCellSpace = self.getCellreference(referenceCellID)
+        referenceCellSpace = self.model.getCellreference(referenceCellID)
         for cellSpaceBoundary in referenceCellSpace.cellSpaceBoundarys:
             if(self.model.CellSpaceBoundarys[cellSpaceBoundary].usage == 'Door'):
                 exits.append(cellSpaceBoundary)
 
         return exits
 
-    def getEntrances(self, current=None):
+    def getEntrances(self, spaceLayerID, current=None):
         entrances = []
         for cellSpace_id, cellSpace in self.model.CellSpaces.items():
-            if(cellSpace.usage == 'Entrance'):
+            if(cellSpace.usage == 'Entrance' and self.model.getLayerOfaCell(cellSpace_id) == spaceLayerID):
                 entrances.append(cellSpace_id)
         return entrances
 
     def getSpaceLayersID(self, current=None):
         return self.model.get_SpaceLayers_id()
 
-    def getCellofPosition(self, position, current=None):
-        return self.model.findCellIDofPointInKDTree(position)
+    def getCellofPosition(self, spaceLayerID, position, current=None):
+        return self.model.findCellIDofPointInKDTree(spaceLayerID, position)
 
-    def getPathCellToCell(self, CellIDfrom, CellIDto, current=None):
-        cellSpaceFrom = self.getCellreference(CellIDfrom).duality
-        cellSpaceTo = self.getCellreference(CellIDto).duality
+    def getPathCellToCell(self, spaceLayerID, CellIDfrom, CellIDto, current=None):
+        cellSpaceFrom = self.model.getCellreference(CellIDfrom).duality
+        cellSpaceTo = self.model.getCellreference(CellIDto).duality
 
         nodes = nx.dijkstra_path(
-            self.igmlLayer_graph, cellSpaceFrom, cellSpaceTo)
+            self.model.spaceLayers[spaceLayerID], cellSpaceFrom, cellSpaceTo)
 
         result = []
         for n in nodes:
-            result.append(self.igmlLayer_graph.nodes[n]['obj'].duality)
+            result.append(
+                self.model.spaceLayers[spaceLayerID].nodes[n]['obj'].duality)
 
         return result
 
-    def getPathPositionToPosition(self, positionFrom, positionTo, current=None):
-        cellIDfrom = self.getCellofPosition(positionFrom)
-        cellIDTo = self.getCellofPosition(positionTo)
-        return self.getPathCellToCell(cellIDfrom, cellIDTo)
+    def getPathPositionToPosition(self, spaceLayerID, positionFrom, positionTo, current=None):
+        cellIDfrom = self.getCellofPosition(spaceLayerID, positionFrom)
+        cellIDTo = self.getCellofPosition(spaceLayerID, positionTo)
+        return self.getPathCellToCell(spaceLayerID, cellIDfrom, cellIDTo)
 
 
 class Server(Ice.Application):

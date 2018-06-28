@@ -64,21 +64,21 @@ module UrbanService{
     CellSequenceID getAdjacentCells(string referenceCellID);
     //CellSequenceID getAccesibleCells(string referenceCellID);
 
-    CellSequence getCells();
-    CellSpaceBoundarySequence getCellSpaceBoundarys();
-    StateSequence getStates();
-    TransitionSequence getTransitions();
+    CellSequence getCells(string spaceLayerID);
+    CellSpaceBoundarySequence getCellSpaceBoundarys(string spaceLayerID);
+    StateSequence getStates(string spaceLayerID);
+    TransitionSequence getTransitions(string spaceLayerID);
 
-    string getCellofPosition(position3D position);
-    CellSequenceID getPathCellToCell(string CellIDfrom, string CellIDto);
-    CellSequenceID getPathPositionToPosition(position3D positionFrom, position3D positionTo);
+    string getCellofPosition(string spaceLayerID, position3D position);
+    CellSequenceID getPathCellToCell(string spaceLayerID, string CellIDfrom, string CellIDto);
+    CellSequenceID getPathPositionToPosition(string spaceLayerID, position3D positionFrom, position3D positionTo);
 
     string getUsage(string referenceCellID);
     string getName(string referenceCellID);
     float getHeight(string referenceCellID);
 
     SurfaceSequenceID getExits(string referenceCellID);
-    BoundarySequenceID getEntrances();
+    BoundarySequenceID getEntrances(string spaceLayerID);
 
     SpaceLayersSequenceID getSpaceLayersID();
   };
