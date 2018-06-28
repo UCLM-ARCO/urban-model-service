@@ -54,7 +54,7 @@ module UrbanService{
   sequence<state>StateSequence;
   sequence<transition>TransitionSequence;
 
-  interface TopologyLayer{
+  interface IgmlLayer{
     bool isConnectedCell(string referenceCellID, string cellToCheqID);
     bool isAdjacentCell(string referenceCellID, string cellToCheqID);
     //bool isAccesibleCell(string referenceCellID, string cellToCheqID);

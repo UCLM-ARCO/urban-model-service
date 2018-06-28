@@ -11,10 +11,10 @@ Ice.loadSlice('../slice/UrbanService.ice')
 import UrbanService
 
 
-class TopologyLayerI(UrbanService.TopologyLayer):
+class IgmlLayerI(UrbanService.IgmlLayer):
     def __init__(self, model):
         self.model = model
-        self.topologyLayer_graph = self.model.spaceLayers['TOPOLOGY']
+        self.igmlLayer_graph = self.model.spaceLayers['TOPOLOGY']
 
     def getCellreference(self, cellID):
         if cellID in self.model.CellSpaces:
@@ -29,7 +29,7 @@ class TopologyLayerI(UrbanService.TopologyLayer):
         referenceCellSpace_duality = referenceCellSpace.duality
         cellSpaceToCheq_duality = cellSpaceToCheq.duality
 
-        return cellSpaceToCheq_duality in self.topologyLayer_graph.neighbors(referenceCellSpace_duality)
+        return cellSpaceToCheq_duality in self.igmlLayer_graph.neighbors(referenceCellSpace_duality)
 
     def isAdjacentCell(self, referenceCellID, cellToCheqID, current=None):
         referenceCellSpace = self.getCellreference(referenceCellID)
@@ -45,9 +45,9 @@ class TopologyLayerI(UrbanService.TopologyLayer):
         referenceCellSpace = self.getCellreference(referenceCellID)
         referenceCellSpace_duality = referenceCellSpace.duality
 
-        for neighbor in self.topologyLayer_graph.neighbors(referenceCellSpace_duality):
+        for neighbor in self.igmlLayer_graph.neighbors(referenceCellSpace_duality):
             connectedCells.append(
-                self.topologyLayer_graph.nodes[neighbor]['obj'].duality)
+                self.igmlLayer_graph.nodes[neighbor]['obj'].duality)
 
         return connectedCells
 
@@ -67,11 +67,11 @@ class TopologyLayerI(UrbanService.TopologyLayer):
         return list(self.model.CellSpaceBoundarys.values())
 
     def getStates(self, current=None):
-        return(list(nx.get_node_attributes(self.topologyLayer_graph, 'obj').values()))
+        return(list(nx.get_node_attributes(self.igmlLayer_graph, 'obj').values()))
 
     def getTransitions(self, current=None):
         return(list(data['obj'] for node1, node2,
-                    data in self.topologyLayer_graph.edges(data=True)))
+                    data in self.igmlLayer_graph.edges(data=True)))
 
     def getUsage(self, referenceCellID, current=None):
         referenceCellSpace = self.getCellreference(referenceCellID)
@@ -110,11 +110,11 @@ class TopologyLayerI(UrbanService.TopologyLayer):
         cellSpaceTo = self.getCellreference(CellIDto).duality
 
         nodes = nx.dijkstra_path(
-            self.topologyLayer_graph, cellSpaceFrom, cellSpaceTo)
+            self.igmlLayer_graph, cellSpaceFrom, cellSpaceTo)
 
         result = []
         for n in nodes:
-            result.append(self.topologyLayer_graph.nodes[n]['obj'].duality)
+            result.append(self.igmlLayer_graph.nodes[n]['obj'].duality)
 
         return result
 
@@ -130,10 +130,10 @@ class Server(Ice.Application):
 
     def run(self, argv):
         broker = self.communicator()
-        servant = TopologyLayerI(self.model)
+        servant = IgmlLayer(self.model)
 
-        adapter = broker.createObjectAdapter("TopologyLayerAdapter")
-        proxy = adapter.add(servant, broker.stringToIdentity("topologyLayer1"))
+        adapter = broker.createObjectAdapter("IgmlLayerAdapter")
+        proxy = adapter.add(servant, broker.stringToIdentity("IgmlLayer1"))
 
         print(proxy)
         sys.stdout.flush()
