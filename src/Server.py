@@ -15,33 +15,6 @@ class IgmlLayerI(UrbanService.IgmlLayer):
     def __init__(self, model):
         self.model = model
 
-    # def getCellreference(self, cellID):
-    #     if cellID in self.model.CellSpaces:
-    #         return self.model.CellSpaces[cellID]
-    #     else:
-    #         raise Exception('Invalid cellID')
-
-    # def getCellSpaceBoundaryreference(self, cellSpaceBoundaryID):
-    #     if cellSpaceBoundaryID in self.model.CellSpaceBoundarys:
-    #         return self.model.CellSpaceBoundarys[cellSpaceBoundaryID]
-    #     else:
-    #         raise Exception('Invalid cellSpaceBoundaryID')
-    #
-    # def getLayerOfaCell(self, cellID):
-    #     cellSpace = self.model.getCellreference(cellID)
-    #     cellSpace_duality = cellSpace.duality
-    #
-    #     for spaceLayerId in self.model.get_SpaceLayers_id():
-    #         self.igmlLayer_graph = self.model.spaceLayers[spaceLayerId]
-    #
-    #         if(cellSpace_duality in self.igmlLayer_graph.nodes):
-    #             return spaceLayerId
-
-    # def self.model.getLayerOfaBoundary(self, cellSpaceBoundaryID):
-    #     for cellToCheq in self.model.CellSpaces.values():
-    #         if(cellSpaceBoundaryID in cellToCheq.cellSpaceBoundarys):
-    #             return self.model.getLayerOfaCell(cellToCheq.id)
-
     def isConnectedCell(self, referenceCellID, cellToCheqID, current=None):
         spaceLayerID = self.model.getLayerOfaCell(referenceCellID)
         referenceCellSpace = self.model.getCellreference(referenceCellID)
