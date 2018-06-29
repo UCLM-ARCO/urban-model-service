@@ -68,7 +68,7 @@ class IgmlLayerI(UrbanService.IgmlLayer):
         cellSpaceBoundarys = []
 
         for cellSpaceBoundary in self.model.CellSpaceBoundarys.values():
-            if(self.self.model.getLayerOfaBoundary(cellSpaceBoundary.id) == spaceLayerID):
+            if(self.model.getLayerOfaBoundary(cellSpaceBoundary.id) == spaceLayerID):
                 cellSpaceBoundarys.append(cellSpaceBoundary)
 
         return cellSpaceBoundarys
@@ -91,7 +91,11 @@ class IgmlLayerI(UrbanService.IgmlLayer):
     def getHeight(self, referenceCellID, current=None):
         referenceCellSpace = self.model.getCellreference(referenceCellID)
         surfaces = referenceCellSpace.geometry.surfaces
-        return surfaces[0][0].z - surfaces[len(surfaces) - 1][0].z
+
+        z_base_coord = surfaces[len(surfaces) - 1].linearRing[0].z
+        z_roof_coord = surfaces[0].linearRing[0].z
+
+        return z_roof_coord - z_base_coord
 
     def getExits(self, referenceCellID, current=None):
         exits = []

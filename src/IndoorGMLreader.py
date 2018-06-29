@@ -50,7 +50,7 @@ class IndoorGMLreader:
                     'gml:description', ns).text
                 cellSpaceBoundary_usage = dirty_cellSpaceBoundary_usage[6:]
 
-            geometry_id = node.find('indoorgml:geometry3D', ns).find(
+            surface_id = node.find('indoorgml:geometry3D', ns).find(
                 'gml:Polygon', ns).attrib[ns['id']]
 
             cellSpaceBoundary_linearRing_node = node.find('indoorgml:geometry3D', ns).find(
@@ -64,8 +64,8 @@ class IndoorGMLreader:
                     float(position[1]),
                     float(position[2])))
 
-            geometry = UrbanService.geometry3D(
-                geometry_id, [linearRing])
+            geometry = UrbanService.Geometry3D(
+                'No id', [UrbanService.Surface(surface_id, linearRing)])
             self.CellSpaceBoundarys[cellSpaceBoundary_id] = UrbanService.cellSpaceBoundary(
                 cellSpaceBoundary_id, cellSpaceBoundary_name,
                 cellSpaceBoundary_usage, geometry)
@@ -105,6 +105,8 @@ class IndoorGMLreader:
 
             surfaces = []
             for surfaceMember in shell_node.findall('gml:surfaceMember', ns):
+                surface_id = surfaceMember.find(
+                    'gml:Polygon', ns).attrib[ns['id']]
                 linearRing_node = surfaceMember.find('gml:Polygon', ns).find(
                     'gml:exterior', ns).find('gml:LinearRing', ns)
 
@@ -115,14 +117,14 @@ class IndoorGMLreader:
                     linearRing.append(UrbanService.position3D(
                         float(position[0]), float(position[1]), float(position[2])))
 
-                surfaces.append(linearRing)
+                surfaces.append(UrbanService.Surface(surface_id, linearRing))
 
             cellSpaceBoundarys = []
             for partialboundedByNode in node.findall('indoorgml:partialboundedBy', ns):
                 cellSpaceBoundarys.append(
                     partialboundedByNode.attrib[ns['href']][1:])
 
-            geometry = UrbanService.geometry3D(geometry_id, surfaces)
+            geometry = UrbanService.Geometry3D(geometry_id, surfaces)
             self.CellSpaces[cellSpace_id] = UrbanService.cellSpace(cellSpace_id, cellSpace_name,
                                                                    cellSpace_usage, cellSpace_duality, geometry, cellSpaceBoundarys)
 
@@ -134,13 +136,13 @@ class IndoorGMLreader:
         base_surface = None
 
         for surface in surfaces:
-            if(all(point.z == surface[0].z for point in surface)):
-                if(surface[0].z < z_base_coords):
-                    z_base_coords = surface[0].z
+            if(all(point.z == surface.linearRing[0].z for point in surface.linearRing)):
+                if(surface.linearRing[0].z < z_base_coords):
+                    z_base_coords = surface.linearRing[0].z
                     base_surface = surface
 
         points = []
-        for point in base_surface:
+        for point in base_surface.linearRing:
             points.append([point.x, point.y, z_base_coords])
 
         polygon_cell = Polygon(points)

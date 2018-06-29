@@ -6,19 +6,15 @@ module UrbanService{
     float z;
   };
 
-  sequence<string> IDsequence;
   sequence<position3D> LinearRing;
-  sequence<Surface> SurfaceSequence;
+  sequence<string> IDsequence;
 
-  /* struct geometry3D{
-    string id;
-    LinearRingSequence surfaces;
-  }; */
-
-  struct surface{
+  struct Surface{
     string id;
     LinearRing linearRing;
   };
+
+  sequence<Surface> SurfaceSequence;
 
   struct Geometry3D{
     string id;
