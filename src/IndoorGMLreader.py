@@ -186,12 +186,19 @@ class IndoorGMLreader:
             state_id = state_node.attrib[ns['id']]
             state_name = state_node.find('gml:name', ns).text
 
+            position_coords = state_node.find('indoorgml:geometry', ns).find(
+                'gml:Point', ns).find('gml:pos', ns).text.split()
+
+            position = UrbanService.position3D(
+                float(position_coords[0]), float(position_coords[1]), float(position_coords[2]))
+
             state_duality_node = state_node.find('indoorgml:duality', ns)
             state_duality = ''
             if(state_duality_node is not None):
                 state_duality = state_duality_node.attrib[ns['href']][1:]
 
-            state = UrbanService.state(state_id, state_name, state_duality)
+            state = UrbanService.state(
+                state_id, position, state_name, state_duality)
             graph.add_node(state_id, obj=state)
 
     def loadEdges(self, root, graph):

@@ -39,6 +39,7 @@ module UrbanService{
 
   struct state{
     string id;
+    position3D position;
     string name;
     string duality;
   };
