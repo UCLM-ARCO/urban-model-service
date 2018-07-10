@@ -219,8 +219,15 @@ class IndoorGMLreader:
             state_ref_1 = connects[0].attrib[ns['href']][1:]
             state_ref_2 = connects[1].attrib[ns['href']][1:]
 
+            lineString = []
+
+            for pos in transition_node.find('indoorgml:geometry', ns).find('gml:LineString', ns).findall('gml:pos', ns):
+                position = pos.text.split()
+                lineString.append(UrbanService.position3D(
+                    float(position[0]), float(position[1]), float(position[2])))
+
             transition = UrbanService.transition(
-                transition_id, transition_name, transition_weight, transition_duality, state_ref_1, state_ref_2)
+                transition_id, transition_name, transition_weight, transition_duality, state_ref_1, state_ref_2, lineString)
             graph.add_edge(state_ref_1, state_ref_2, obj=transition)
 
     def drawLayer(self, spaceLayer_id):

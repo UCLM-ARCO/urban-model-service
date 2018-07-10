@@ -7,6 +7,7 @@ module UrbanService{
   };
 
   sequence<position3D> LinearRing;
+  sequence<position3D> LineString;
   sequence<string> IDsequence;
 
   struct Surface{
@@ -51,6 +52,7 @@ module UrbanService{
     string duality;
     string connectsFrom;
     string connectsTo;
+    LineString lineString;
   };
 
   sequence<cellSpace> CellSequence;
