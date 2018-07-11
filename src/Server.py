@@ -55,6 +55,20 @@ class IgmlLayerI(UrbanService.IgmlLayer):
 
         return adjacentCells
 
+    def getCellSpaceBoundarysBetweenCells(self, referenceCellID1, referenceCellID2, current=None):
+        cellSpaceBoundarysID = []
+        cellSpace1 = self.model.getCellreference(referenceCellID1)
+        cellSpace2 = self.model.getCellreference(referenceCellID2)
+
+        cellSpace1Boundarys = cellSpace1.cellSpaceBoundarys
+        cellSpace2Boundarys = cellSpace2.cellSpaceBoundarys
+
+        for cellSpace1Boundary in cellSpace1Boundarys:
+            if(cellSpace1Boundary in cellSpace2Boundarys):
+                cellSpaceBoundarysID.append(cellSpace1Boundary)
+
+        return cellSpaceBoundarysID
+
     def getCells(self, spaceLayerID, current=None):
         cells = []
 
