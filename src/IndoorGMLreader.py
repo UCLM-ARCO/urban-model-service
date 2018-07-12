@@ -44,11 +44,18 @@ class IndoorGMLreader:
             cellSpaceBoundary_id = node.attrib[ns['id']]
             cellSpaceBoundary_name = node.find('gml:name', ns).text
 
-            cellSpaceBoundary_usage = ''
+            cellSpaceBoundary_usage = 'None'
+            cellSpaceBoundary_material = 'None'
             if(node.find('gml:description', ns) is not None):
-                dirty_cellSpaceBoundary_usage = node.find(
-                    'gml:description', ns).text
-                cellSpaceBoundary_usage = dirty_cellSpaceBoundary_usage[6:]
+                description = node.find('gml:description', ns).text.split("/")
+
+                for des in description:
+                    des_type = des.split("=")[0]
+                    des_value = des.split("=")[1]
+                    if(des_type == "Usage"):
+                        cellSpaceBoundary_usage = des_value
+                    elif(des_type == "Material"):
+                        cellSpaceBoundary_material = des_value
 
             surface_id = node.find('indoorgml:geometry3D', ns).find(
                 'gml:Polygon', ns).attrib[ns['id']]
@@ -68,7 +75,7 @@ class IndoorGMLreader:
                 'No id', [UrbanService.Surface(surface_id, linearRing)])
             self.CellSpaceBoundarys[cellSpaceBoundary_id] = UrbanService.cellSpaceBoundary(
                 cellSpaceBoundary_id, cellSpaceBoundary_name,
-                cellSpaceBoundary_usage, geometry)
+                cellSpaceBoundary_usage, cellSpaceBoundary_material, geometry)
 
             node.clear()
 
