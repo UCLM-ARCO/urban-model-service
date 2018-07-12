@@ -28,7 +28,7 @@ module UrbanService{
     string usage;
     string duality;
     Geometry3D geometry;
-    IDsequence cellSpaceBoundarys;
+    IDsequence cellSpaceBoundaries;
   };
 
   struct cellSpaceBoundary{
@@ -70,10 +70,10 @@ module UrbanService{
     IDsequence getAdjacentCells(string referenceCellID);
     //IDsequence getAccesibleCells(string referenceCellID);
 
-    IDsequence getCellSpaceBoundarysBetweenCells(string referenceCellID1, string referenceCellID2);
+    IDsequence getCellSpaceBoundariesBetweenCells(string referenceCellID1, string referenceCellID2);
 
     CellSequence getCells(string spaceLayerID);
-    CellSpaceBoundarySequence getCellSpaceBoundarys(string spaceLayerID);
+    CellSpaceBoundarySequence getCellSpaceBoundaries(string spaceLayerID);
     StateSequence getStates(string spaceLayerID);
     TransitionSequence getTransitions(string spaceLayerID);
 

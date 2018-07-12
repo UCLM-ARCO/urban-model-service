@@ -29,10 +29,10 @@ class IgmlLayerI(UrbanService.IgmlLayer):
         referenceCellSpace = self.model.getCellreference(referenceCellID)
         cellSpaceToCheq = self.model.getCellreference(cellToCheqID)
 
-        referenceCellSpaceBoundarys = referenceCellSpace.cellSpaceBoundarys
-        cellSpaceToCheqBoundarys = cellSpaceToCheq.cellSpaceBoundarys
+        referenceCellSpaceBoundaries = referenceCellSpace.cellSpaceBoundaries
+        cellSpaceToCheqBoundaries = cellSpaceToCheq.cellSpaceBoundaries
 
-        return any(cellSpaceToCheqBoundary in referenceCellSpaceBoundarys for cellSpaceToCheqBoundary in cellSpaceToCheqBoundarys)
+        return any(cellSpaceToCheqBoundary in referenceCellSpaceBoundaries for cellSpaceToCheqBoundary in cellSpaceToCheqBoundaries)
 
     def getConnectedCells(self, referenceCellID, current=None):
         connectedCells = []
@@ -55,19 +55,19 @@ class IgmlLayerI(UrbanService.IgmlLayer):
 
         return adjacentCells
 
-    def getCellSpaceBoundarysBetweenCells(self, referenceCellID1, referenceCellID2, current=None):
-        cellSpaceBoundarysID = []
+    def getCellSpaceBoundariesBetweenCells(self, referenceCellID1, referenceCellID2, current=None):
+        cellSpaceBoundariesID = []
         cellSpace1 = self.model.getCellreference(referenceCellID1)
         cellSpace2 = self.model.getCellreference(referenceCellID2)
 
-        cellSpace1Boundarys = cellSpace1.cellSpaceBoundarys
-        cellSpace2Boundarys = cellSpace2.cellSpaceBoundarys
+        cellSpace1Boundaries = cellSpace1.cellSpaceBoundaries
+        cellSpace2Boundaries = cellSpace2.cellSpaceBoundaries
 
-        for cellSpace1Boundary in cellSpace1Boundarys:
-            if(cellSpace1Boundary in cellSpace2Boundarys):
-                cellSpaceBoundarysID.append(cellSpace1Boundary)
+        for cellSpace1Boundary in cellSpace1Boundaries:
+            if(cellSpace1Boundary in cellSpace2Boundaries):
+                cellSpaceBoundariesID.append(cellSpace1Boundary)
 
-        return cellSpaceBoundarysID
+        return cellSpaceBoundariesID
 
     def getCells(self, spaceLayerID, current=None):
         cells = []
@@ -78,14 +78,14 @@ class IgmlLayerI(UrbanService.IgmlLayer):
 
         return cells
 
-    def getCellSpaceBoundarys(self, spaceLayerID, current=None):
-        cellSpaceBoundarys = []
+    def getCellSpaceBoundaries(self, spaceLayerID, current=None):
+        cellSpaceBoundaries = []
 
-        for cellSpaceBoundary in self.model.CellSpaceBoundarys.values():
+        for cellSpaceBoundary in self.model.cellSpaceBoundaries.values():
             if(self.model.getLayerOfaBoundary(cellSpaceBoundary.id) == spaceLayerID):
-                cellSpaceBoundarys.append(cellSpaceBoundary)
+                cellSpaceBoundaries.append(cellSpaceBoundary)
 
-        return cellSpaceBoundarys
+        return cellSpaceBoundaries
 
     def getStates(self, spaceLayerID, current=None):
         return(list(nx.get_node_attributes(self.model.spaceLayers[spaceLayerID], 'obj').values()))
@@ -114,8 +114,8 @@ class IgmlLayerI(UrbanService.IgmlLayer):
     def getExits(self, referenceCellID, current=None):
         exits = []
         referenceCellSpace = self.model.getCellreference(referenceCellID)
-        for cellSpaceBoundary in referenceCellSpace.cellSpaceBoundarys:
-            if(self.model.CellSpaceBoundarys[cellSpaceBoundary].usage == 'Door'):
+        for cellSpaceBoundary in referenceCellSpace.cellSpaceBoundaries:
+            if(self.model.cellSpaceBoundaries[cellSpaceBoundary].usage == 'Door'):
                 exits.append(cellSpaceBoundary)
 
         return exits

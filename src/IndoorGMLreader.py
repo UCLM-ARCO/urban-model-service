@@ -30,13 +30,13 @@ ns = {'indoorgml': 'http://www.opengis.net/indoorgml/1.0/core',
 class IndoorGMLreader:
     def __init__(self, _file):
         self.file = _file
-        self.loadCellSpaceBoundarys()
+        self.loadCellSpaceBoundaries()
         self.loadCellSpaces()
         self.createKDTree()
         self.loadSpaceLayers()
 
-    def loadCellSpaceBoundarys(self):
-        self.CellSpaceBoundarys = {}
+    def loadCellSpaceBoundaries(self):
+        self.cellSpaceBoundaries = {}
         for (event, node) in etree.iterparse(self.file, events=['end'],
                                              tag=ns['CellSpaceBoundary'],
                                              huge_tree=True):
@@ -73,7 +73,7 @@ class IndoorGMLreader:
 
             geometry = UrbanService.Geometry3D(
                 'No id', [UrbanService.Surface(surface_id, linearRing)])
-            self.CellSpaceBoundarys[cellSpaceBoundary_id] = UrbanService.cellSpaceBoundary(
+            self.cellSpaceBoundaries[cellSpaceBoundary_id] = UrbanService.cellSpaceBoundary(
                 cellSpaceBoundary_id, cellSpaceBoundary_name,
                 cellSpaceBoundary_usage, cellSpaceBoundary_material, geometry)
 
@@ -126,14 +126,14 @@ class IndoorGMLreader:
 
                 surfaces.append(UrbanService.Surface(surface_id, linearRing))
 
-            cellSpaceBoundarys = []
+            cellSpaceBoundaries = []
             for partialboundedByNode in node.findall('indoorgml:partialboundedBy', ns):
-                cellSpaceBoundarys.append(
+                cellSpaceBoundaries.append(
                     partialboundedByNode.attrib[ns['href']][1:])
 
             geometry = UrbanService.Geometry3D(geometry_id, surfaces)
             self.CellSpaces[cellSpace_id] = UrbanService.cellSpace(cellSpace_id, cellSpace_name,
-                                                                   cellSpace_usage, cellSpace_duality, geometry, cellSpaceBoundarys)
+                                                                   cellSpace_usage, cellSpace_duality, geometry, cellSpaceBoundaries)
 
             self.addBasePolygonOfCell(surfaces, cellSpace_id)
             node.clear()
@@ -290,5 +290,5 @@ class IndoorGMLreader:
 
     def getLayerOfaBoundary(self, cellSpaceBoundaryID):
         for cellToCheq in self.CellSpaces.values():
-            if(cellSpaceBoundaryID in cellToCheq.cellSpaceBoundarys):
+            if(cellSpaceBoundaryID in cellToCheq.cellSpaceBoundaries):
                 return self.getLayerOfaCell(cellToCheq.id)
