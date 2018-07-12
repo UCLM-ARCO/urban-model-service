@@ -35,6 +35,7 @@ module UrbanService{
     string id;
     string name;
     string usage;
+    string material;
     Geometry3D geometry;
   };
 
