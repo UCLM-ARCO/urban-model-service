@@ -44,8 +44,8 @@ class IndoorGMLreader:
             cellSpaceBoundary_id = node.attrib[ns['id']]
             cellSpaceBoundary_name = node.find('gml:name', ns).text
 
-            cellSpaceBoundary_usage = 'None'
-            cellSpaceBoundary_material = 'None'
+            cellSpaceBoundary_usage = None
+            cellSpaceBoundary_material = None
             if(node.find('gml:description', ns) is not None):
                 description = node.find('gml:description', ns).text.split("/")
 
@@ -90,14 +90,14 @@ class IndoorGMLreader:
             cellSpace_id = node.attrib[ns['id']]
             cellSpace_name = node.find('gml:name', ns).text
 
-            cellSpace_usage = ''
+            cellSpace_usage = None
             if(node.find('gml:description', ns) is not None):
                 dirty_cellSpace_usage = node.find(
                     'gml:description', ns).text
                 cellSpace_usage = re.split(':|=', dirty_cellSpace_usage)[1]
 
             cellSpace_duality_node = node.find('indoorgml:duality', ns)
-            cellSpace_duality = ''
+            cellSpace_duality = None
             if(cellSpace_duality_node is not None):
                 cellSpace_duality = cellSpace_duality_node.attrib[ns['href']][1:]
 
@@ -200,7 +200,7 @@ class IndoorGMLreader:
                 float(position_coords[0]), float(position_coords[1]), float(position_coords[2]))
 
             state_duality_node = state_node.find('indoorgml:duality', ns)
-            state_duality = ''
+            state_duality = None
             if(state_duality_node is not None):
                 state_duality = state_duality_node.attrib[ns['href']][1:]
 
@@ -218,7 +218,7 @@ class IndoorGMLreader:
 
             transition_duality_node = transition_node.find(
                 'indoorgml:duality', ns)
-            transition_duality = ''
+            transition_duality = None
             if(transition_duality_node is not None):
                 transition_duality = transition_duality_node.attrib[ns['href']][1:]
 
