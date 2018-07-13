@@ -79,4 +79,15 @@ module UrbanService{
     SurfaceSequenceID getExits(string referenceCellID);
     BoundarySequenceID getEntrances();
   };
+
+  // State: PROPOSAL
+  struct georef{
+    string pluscode;
+    string placecode;
+  };
+
+  interface GeoHashingService{
+    string getPlusCode(position3D position);
+    georef getGeoRef(position3D position);
+  };
 };
