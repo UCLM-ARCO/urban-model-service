@@ -4,6 +4,7 @@
 import sys
 import Ice
 import networkx as nx
+from shapely.geometry import Point
 
 from IndoorGMLreader import IndoorGMLreader
 
@@ -132,6 +133,14 @@ class IgmlLayerI(UrbanService.IgmlLayer):
 
     def getCellofPosition(self, spaceLayerID, position, current=None):
         return self.model.findCellIDofPointInKDTree(spaceLayerID, position)
+
+    def isPositionInCell(self, position, cell, current=None):
+        z_coord_of_position_ground = self.model.calculateGroundOfPosition(
+            position.z)
+        point = [position.x, position.y, z_coord_of_position_ground]
+        for value in self.model.shapePoligons.values():
+            if(value[0] == cell):
+                return(value[1].contains(Point(point)))
 
     def getPathCellToCell(self, spaceLayerID, CellIDfrom, CellIDto, current=None):
         cellSpaceFrom = self.model.getCellreference(CellIDfrom).duality

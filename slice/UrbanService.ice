@@ -78,6 +78,7 @@ module UrbanService{
     TransitionSequence getTransitions(string spaceLayerID);
 
     string getCellofPosition(string spaceLayerID, position3D position);
+    bool isPositionInCell(position3D position, string cell);
     IDsequence getPathCellToCell(string spaceLayerID, string CellIDfrom, string CellIDto);
     IDsequence getPathPositionToPosition(string spaceLayerID, position3D positionFrom, position3D positionTo);
 
