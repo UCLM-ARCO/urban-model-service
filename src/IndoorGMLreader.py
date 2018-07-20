@@ -30,13 +30,13 @@ ns = {'indoorgml': 'http://www.opengis.net/indoorgml/1.0/core',
 class IndoorGMLreader:
     def __init__(self, _file):
         self.file = _file
-        self.loadCellSpaceBoundarys()
+        self.loadCellSpaceBoundaries()
         self.loadCellSpaces()
         self.createKDTree()
         self.loadSpaceLayers()
 
-    def loadCellSpaceBoundarys(self):
-        self.CellSpaceBoundarys = {}
+    def loadCellSpaceBoundaries(self):
+        self.cellSpaceBoundaries = {}
         for (event, node) in etree.iterparse(self.file, events=['end'],
                                              tag=ns['CellSpaceBoundary'],
                                              huge_tree=True):
@@ -44,13 +44,20 @@ class IndoorGMLreader:
             cellSpaceBoundary_id = node.attrib[ns['id']]
             cellSpaceBoundary_name = node.find('gml:name', ns).text
 
-            cellSpaceBoundary_usage = ''
+            cellSpaceBoundary_usage = None
+            cellSpaceBoundary_material = None
             if(node.find('gml:description', ns) is not None):
-                dirty_cellSpaceBoundary_usage = node.find(
-                    'gml:description', ns).text
-                cellSpaceBoundary_usage = dirty_cellSpaceBoundary_usage[6:]
+                description = node.find('gml:description', ns).text.split("/")
 
-            geometry_id = node.find('indoorgml:geometry3D', ns).find(
+                for des in description:
+                    des_type = des.split("=")[0]
+                    des_value = des.split("=")[1]
+                    if(des_type == "Usage"):
+                        cellSpaceBoundary_usage = des_value
+                    elif(des_type == "Material"):
+                        cellSpaceBoundary_material = des_value
+
+            surface_id = node.find('indoorgml:geometry3D', ns).find(
                 'gml:Polygon', ns).attrib[ns['id']]
 
             cellSpaceBoundary_linearRing_node = node.find('indoorgml:geometry3D', ns).find(
@@ -64,11 +71,11 @@ class IndoorGMLreader:
                     float(position[1]),
                     float(position[2])))
 
-            geometry = UrbanService.geometry3D(
-                geometry_id, [linearRing])
-            self.CellSpaceBoundarys[cellSpaceBoundary_id] = UrbanService.cellSpaceBoundary(
+            geometry = UrbanService.Geometry3D(
+                'No id', [UrbanService.Surface(surface_id, linearRing)])
+            self.cellSpaceBoundaries[cellSpaceBoundary_id] = UrbanService.cellSpaceBoundary(
                 cellSpaceBoundary_id, cellSpaceBoundary_name,
-                cellSpaceBoundary_usage, geometry)
+                cellSpaceBoundary_usage, cellSpaceBoundary_material, geometry)
 
             node.clear()
 
@@ -83,14 +90,14 @@ class IndoorGMLreader:
             cellSpace_id = node.attrib[ns['id']]
             cellSpace_name = node.find('gml:name', ns).text
 
-            cellSpace_usage = ''
+            cellSpace_usage = None
             if(node.find('gml:description', ns) is not None):
                 dirty_cellSpace_usage = node.find(
                     'gml:description', ns).text
                 cellSpace_usage = re.split(':|=', dirty_cellSpace_usage)[1]
 
             cellSpace_duality_node = node.find('indoorgml:duality', ns)
-            cellSpace_duality = ''
+            cellSpace_duality = None
             if(cellSpace_duality_node is not None):
                 cellSpace_duality = cellSpace_duality_node.attrib[ns['href']][1:]
 
@@ -105,6 +112,8 @@ class IndoorGMLreader:
 
             surfaces = []
             for surfaceMember in shell_node.findall('gml:surfaceMember', ns):
+                surface_id = surfaceMember.find(
+                    'gml:Polygon', ns).attrib[ns['id']]
                 linearRing_node = surfaceMember.find('gml:Polygon', ns).find(
                     'gml:exterior', ns).find('gml:LinearRing', ns)
 
@@ -115,16 +124,16 @@ class IndoorGMLreader:
                     linearRing.append(UrbanService.position3D(
                         float(position[0]), float(position[1]), float(position[2])))
 
-                surfaces.append(linearRing)
+                surfaces.append(UrbanService.Surface(surface_id, linearRing))
 
-            cellSpaceBoundarys = []
+            cellSpaceBoundaries = []
             for partialboundedByNode in node.findall('indoorgml:partialboundedBy', ns):
-                cellSpaceBoundarys.append(
+                cellSpaceBoundaries.append(
                     partialboundedByNode.attrib[ns['href']][1:])
 
-            geometry = UrbanService.geometry3D(geometry_id, surfaces)
+            geometry = UrbanService.Geometry3D(geometry_id, surfaces)
             self.CellSpaces[cellSpace_id] = UrbanService.cellSpace(cellSpace_id, cellSpace_name,
-                                                                   cellSpace_usage, cellSpace_duality, geometry, cellSpaceBoundarys)
+                                                                   cellSpace_usage, cellSpace_duality, geometry, cellSpaceBoundaries)
 
             self.addBasePolygonOfCell(surfaces, cellSpace_id)
             node.clear()
@@ -134,13 +143,13 @@ class IndoorGMLreader:
         base_surface = None
 
         for surface in surfaces:
-            if(all(point.z == surface[0].z for point in surface)):
-                if(surface[0].z < z_base_coords):
-                    z_base_coords = surface[0].z
+            if(all(point.z == surface.linearRing[0].z for point in surface.linearRing)):
+                if(surface.linearRing[0].z < z_base_coords):
+                    z_base_coords = surface.linearRing[0].z
                     base_surface = surface
 
         points = []
-        for point in base_surface:
+        for point in base_surface.linearRing:
             points.append([point.x, point.y, z_base_coords])
 
         polygon_cell = Polygon(points)
@@ -184,12 +193,19 @@ class IndoorGMLreader:
             state_id = state_node.attrib[ns['id']]
             state_name = state_node.find('gml:name', ns).text
 
+            position_coords = state_node.find('indoorgml:geometry', ns).find(
+                'gml:Point', ns).find('gml:pos', ns).text.split()
+
+            position = UrbanService.position3D(
+                float(position_coords[0]), float(position_coords[1]), float(position_coords[2]))
+
             state_duality_node = state_node.find('indoorgml:duality', ns)
-            state_duality = ''
+            state_duality = None
             if(state_duality_node is not None):
                 state_duality = state_duality_node.attrib[ns['href']][1:]
 
-            state = UrbanService.state(state_id, state_name, state_duality)
+            state = UrbanService.state(
+                state_id, position, state_name, state_duality)
             graph.add_node(state_id, obj=state)
 
     def loadEdges(self, root, graph):
@@ -202,7 +218,7 @@ class IndoorGMLreader:
 
             transition_duality_node = transition_node.find(
                 'indoorgml:duality', ns)
-            transition_duality = ''
+            transition_duality = None
             if(transition_duality_node is not None):
                 transition_duality = transition_duality_node.attrib[ns['href']][1:]
 
@@ -210,8 +226,15 @@ class IndoorGMLreader:
             state_ref_1 = connects[0].attrib[ns['href']][1:]
             state_ref_2 = connects[1].attrib[ns['href']][1:]
 
+            lineString = []
+
+            for pos in transition_node.find('indoorgml:geometry', ns).find('gml:LineString', ns).findall('gml:pos', ns):
+                position = pos.text.split()
+                lineString.append(UrbanService.position3D(
+                    float(position[0]), float(position[1]), float(position[2])))
+
             transition = UrbanService.transition(
-                transition_id, transition_name, transition_weight, transition_duality, state_ref_1, state_ref_2)
+                transition_id, transition_name, transition_weight, transition_duality, state_ref_1, state_ref_2, lineString)
             graph.add_edge(state_ref_1, state_ref_2, obj=transition)
 
     def drawLayer(self, spaceLayer_id):
@@ -228,7 +251,7 @@ class IndoorGMLreader:
 
         return spaceLayers_id
 
-    def findCellIDofPointInKDTree(self, position):
+    def findCellIDofPointInKDTree(self, spaceLayerID, position):
         z_coord_of_position_ground = self.calculateGroundOfPosition(position.z)
         point = [position.x, position.y, z_coord_of_position_ground]
         distances, ndx = self.kdtree.query(point, k=len(self.CellSpaces))
@@ -240,7 +263,7 @@ class IndoorGMLreader:
                                                              centroid_cell_coords[2])]
 
             polygon_z_coords = np.asarray(polygon_cell.exterior.coords)[0][2]
-            if(polygon_cell.contains(Point(point)) and
+            if(spaceLayerID == self.getLayerOfaCell(cellSpace_id) and polygon_cell.contains(Point(point)) and
                polygon_z_coords == point[2]):
                 return cellSpace_id
                 break
@@ -248,3 +271,24 @@ class IndoorGMLreader:
 
     def calculateGroundOfPosition(self, z_coor):
         return int(z_coor / 3) * 3
+
+    def getCellreference(self, cellID):
+        if cellID in self.CellSpaces:
+            return self.CellSpaces[cellID]
+        else:
+            raise Exception('Invalid cellID')
+
+    def getLayerOfaCell(self, cellID):
+        cellSpace = self.getCellreference(cellID)
+        cellSpace_duality = cellSpace.duality
+
+        for spaceLayerId in self.get_SpaceLayers_id():
+            self.igmlLayer_graph = self.spaceLayers[spaceLayerId]
+
+            if(cellSpace_duality in self.igmlLayer_graph.nodes):
+                return spaceLayerId
+
+    def getLayerOfaBoundary(self, cellSpaceBoundaryID):
+        for cellToCheq in self.CellSpaces.values():
+            if(cellSpaceBoundaryID in cellToCheq.cellSpaceBoundaries):
+                return self.getLayerOfaCell(cellToCheq.id)

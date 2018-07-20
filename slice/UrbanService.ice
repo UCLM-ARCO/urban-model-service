@@ -6,16 +6,20 @@ module UrbanService{
     float z;
   };
 
-  sequence<string> CellSequenceID;
-  sequence<string> CellSpaceBoundaryID;
-  sequence<string> SurfaceSequenceID;
-  sequence<string> BoundarySequenceID;
   sequence<position3D> LinearRing;
-  sequence<LinearRing> LinearRingSequence;
+  sequence<position3D> LineString;
+  sequence<string> IDsequence;
 
-  struct geometry3D{
+  struct Surface{
     string id;
-    LinearRingSequence surfaces;
+    LinearRing linearRing;
+  };
+
+  sequence<Surface> SurfaceSequence;
+
+  struct Geometry3D{
+    string id;
+    SurfaceSequence surfaces;
   };
 
   struct cellSpace{
@@ -23,19 +27,21 @@ module UrbanService{
     string name;
     string usage;
     string duality;
-    geometry3D geometry;
-    CellSpaceBoundaryID cellSpaceBoundarys;
+    Geometry3D geometry;
+    IDsequence cellSpaceBoundaries;
   };
 
   struct cellSpaceBoundary{
     string id;
     string name;
     string usage;
-    geometry3D geometry;
+    string material;
+    Geometry3D geometry;
   };
 
   struct state{
     string id;
+    position3D position;
     string name;
     string duality;
   };
@@ -47,37 +53,43 @@ module UrbanService{
     string duality;
     string connectsFrom;
     string connectsTo;
+    LineString lineString;
   };
 
   sequence<cellSpace> CellSequence;
   sequence<cellSpaceBoundary> CellSpaceBoundarySequence;
-  sequence<state>StateSequence;
-  sequence<transition>TransitionSequence;
+  sequence<state> StateSequence;
+  sequence<transition> TransitionSequence;
 
-  interface TopologyLayer{
+  interface IgmlLayer{
     bool isConnectedCell(string referenceCellID, string cellToCheqID);
     bool isAdjacentCell(string referenceCellID, string cellToCheqID);
     //bool isAccesibleCell(string referenceCellID, string cellToCheqID);
 
-    CellSequenceID getConnectedCells(string referenceCellID);
-    CellSequenceID getAdjacentCells(string referenceCellID);
-    //CellSequenceID getAccesibleCells(string referenceCellID);
+    IDsequence getConnectedCells(string referenceCellID);
+    IDsequence getAdjacentCells(string referenceCellID);
+    //IDsequence getAccesibleCells(string referenceCellID);
 
-    CellSequence getCells();
-    CellSpaceBoundarySequence getCellSpaceBoundarys();
-    StateSequence getStates();
-    TransitionSequence getTransitions();
+    IDsequence getCellSpaceBoundariesBetweenCells(string referenceCellID1, string referenceCellID2);
 
-    string getCellofPosition(position3D position);
-    CellSequenceID getPathCellToCell(string CellIDfrom, string CellIDto);
-    CellSequenceID getPathPositionToPosition(position3D positionFrom, position3D positionTo);
+    CellSequence getCells(string spaceLayerID);
+    CellSpaceBoundarySequence getCellSpaceBoundaries(string spaceLayerID);
+    StateSequence getStates(string spaceLayerID);
+    TransitionSequence getTransitions(string spaceLayerID);
+
+    string getCellofPosition(string spaceLayerID, position3D position);
+    bool isPositionInCell(position3D position, string cell);
+    IDsequence getPathCellToCell(string spaceLayerID, string CellIDfrom, string CellIDto);
+    IDsequence getPathPositionToPosition(string spaceLayerID, position3D positionFrom, position3D positionTo);
 
     string getUsage(string referenceCellID);
     string getName(string referenceCellID);
     float getHeight(string referenceCellID);
 
-    SurfaceSequenceID getExits(string referenceCellID);
-    BoundarySequenceID getEntrances();
+    IDsequence getExits(string referenceCellID);
+    IDsequence getEntrances(string spaceLayerID);
+
+    IDsequence getSpaceLayersID();
   };
 
   // State: PROPOSAL
