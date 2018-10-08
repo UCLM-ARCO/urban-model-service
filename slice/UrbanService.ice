@@ -9,6 +9,7 @@ module UrbanService{
   sequence<position3D> LinearRing;
   sequence<position3D> LineString;
   sequence<string> IDsequence;
+  sequence<string> openLocationCodeSequence;
 
   struct Surface{
     string id;
@@ -56,6 +57,22 @@ module UrbanService{
     LineString lineString;
   };
 
+  struct building{
+    string name;
+    string uuid;
+    openLocationCodeSequence openLocationCodes;
+  };
+
+  struct CodeArea{
+    float latitudeLo;
+    float longitudeLo;
+    float latitudeHi;
+    float longitudeHi;
+    int codeLength;
+    float latitudeCenter;
+    float longitudeCenter;
+  };
+
   sequence<cellSpace> CellSequence;
   sequence<cellSpaceBoundary> CellSpaceBoundarySequence;
   sequence<state> StateSequence;
@@ -90,5 +107,12 @@ module UrbanService{
     IDsequence getEntrances(string spaceLayerID);
 
     IDsequence getSpaceLayersID();
+  };
+
+  interface GeoHashing{
+    string encode(float latitude, float longitude, int codeLength);
+    CodeArea decode(string code);
+    bool isValid(string code);
+    building getBuilding(string name);
   };
 };

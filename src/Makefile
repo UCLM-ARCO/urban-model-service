@@ -2,15 +2,17 @@
 # -*- mode:makefile -*-
 
 MODEL_FILE='../../itsi.indoorgml/model/ITSI.gml'
+OSM_FILE='../test/map.osm'
 
 all:
 
 clean:
-	$(RM) *~ proxy.out
+	$(RM) *~ *.txt
 	$(RM) -rf __pycache__
+	$(RM) -rf ../lib/__pycache__
 
 run-server:
-	./Server.py $(MODEL_FILE) --Ice.Config=Server.config | tee proxy.out
+	./Server.py $(MODEL_FILE) $(OSM_FILE) --Ice.Config=Server.config
 
 run-server-tfm-ana:
-	./Server.py '../../tfm.ana.rubio/case-of-use/model.gml' --Ice.Config=Server.config | tee proxy.out
+	./Server.py '../../tfm.ana.rubio/case-of-use/model.gml' $(OSM_FILE)--Ice.Config=Server.config
