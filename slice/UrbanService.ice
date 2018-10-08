@@ -111,11 +111,10 @@ module UrbanService{
 
   // State: PROPOSAL
   interface GeoHashing{
-    string encode(float latitude, float longitude, int codeLength);
+    string encode(position3D position, int codeLength);
     CodeArea decode(string code);
     bool isValid(string code);
     building getBuilding(string name);
-
   };
     
   // State: PROPOSAL

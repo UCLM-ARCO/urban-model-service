@@ -190,8 +190,8 @@ class GeoHashingI(UrbanService.GeoHashing):
 
                 self.buildingsPolygon[name] = Polygon(points)
 
-    def encode(self, latitude, longitude, codeLength, current=None):
-        return olc.encode(latitude,longitude, codeLength)
+    def encode(self, position, codeLength, current=None):
+        return olc.encode(position.x, position.y, codeLength)
 
     def decode(self, code, current=None):
         result = olc.decode(code)
@@ -209,24 +209,28 @@ class GeoHashingI(UrbanService.GeoHashing):
         latitudeOffset = (1.0/40000)
 
         rightCenter = self.encode(
-            centerOfArea[0], 
-            centerOfArea[1] + longitudeOffset, 
+            UrbanService.position3D(
+                centerOfArea[0], 
+                centerOfArea[1] + longitudeOffset), 
             11)
 
         leftCenter = self.encode(
-            centerOfArea[0], 
-            centerOfArea[1] - longitudeOffset, 
+            UrbanService.position3D(
+                centerOfArea[0], 
+                centerOfArea[1] - longitudeOffset), 
             11)
 
 
         upCenter = self.encode(
-            centerOfArea[0] + latitudeOffset, 
-            centerOfArea[1], 
+            UrbanService.position3D(
+                centerOfArea[0] + latitudeOffset, 
+                centerOfArea[1]), 
             11)
 
         downCenter = self.encode(
-            centerOfArea[0] - latitudeOffset, 
-            centerOfArea[1], 
+            UrbanService.position3D(
+                centerOfArea[0] - latitudeOffset, 
+                centerOfArea[1]), 
             11)
 
 
@@ -242,9 +246,10 @@ class GeoHashingI(UrbanService.GeoHashing):
         proccesedOpenLocationCode = []
         result = []
 
-        initialOpenLocationCode = self.encode(buildingPolygon.centroid.x,       
-                                            buildingPolygon.centroid.y, 
-                                            11)
+        initialOpenLocationCode = self.encode(
+            UrbanService.position3D(buildingPolygon.centroid.x,       
+                                    buildingPolygon.centroid.y), 
+            11)
 
         queue = [initialOpenLocationCode] + self.getNeighbourCodeAreas(initialOpenLocationCode)
 

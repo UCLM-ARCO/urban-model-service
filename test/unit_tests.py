@@ -217,9 +217,10 @@ class GeoHashingTests(TestCase):
     def test_encode(self):
         expected_response = "8CCRX3XJ+526"
         response = (self.GeoHashing.encode(
-                                        38.9979133605957,
-                                        -3.9199843406677246, 
-                                        11))
+            UrbanService.position3D(
+                38.9979133605957,
+                -3.9199843406677246), 
+            11))
         self.assertEqual(expected_response, response)
 
     def test_decode(self):
