@@ -235,7 +235,7 @@ class IndoorGMLreader:
 
             transition = UrbanService.transition(
                 transition_id, transition_name, transition_weight, transition_duality, state_ref_1, state_ref_2, lineString)
-            graph.add_edge(state_ref_1, state_ref_2, obj=transition)
+            graph.add_edge(state_ref_1, state_ref_2, obj=transition, weight=transition_weight)
 
     def drawLayer(self, spaceLayer_id):
         nx.draw(self.spaceLayers[spaceLayer_id], with_labels=True)

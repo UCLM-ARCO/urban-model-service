@@ -147,12 +147,52 @@ class IgmlLayerI(UrbanService.IgmlLayer):
             if(value[0] == cell):
                 return(value[1].contains(Point(point)))
 
+
+    def dijkstra(self, graph, start, end):
+        distances = {} 
+        predecessors = {} 
+        to_assess = graph.nodes 
+
+        for node in graph.nodes:
+            distances[node] = float('inf')
+            predecessors[node] = None
+        
+        sp_set = []
+        distances[start] = 0
+        
+        while len(sp_set) < len(to_assess):
+            still_in = {node: distances[node]\
+                        for node in [node for node in\
+                        to_assess if node not in sp_set]}
+
+            closest = min(still_in, key = distances.get)
+
+            sp_set.append(closest)
+            
+            for node in graph[closest]:
+                if distances[node] > distances[closest] +\
+                        graph[closest][node]['weight']:
+
+                    distances[node] = distances[closest] +\
+                        graph[closest][node]['weight']
+
+                    predecessors[node] = closest
+                    
+        path = [end]
+        while start not in path:
+            path.append(predecessors[path[-1]])
+        
+        return path[::-1], distances[end]
+
+
     def getPathCellToCell(self, spaceLayerID, CellIDfrom, CellIDto, current=None):
         cellSpaceFrom = self.model.getCellreference(CellIDfrom).duality
         cellSpaceTo = self.model.getCellreference(CellIDto).duality
 
-        nodes = nx.dijkstra_path(
-            self.model.spaceLayers[spaceLayerID], cellSpaceFrom, cellSpaceTo)
+        # nodes = nx.dijkstra_path(
+        #     self.model.spaceLayers[spaceLayerID], cellSpaceFrom, cellSpaceTo)
+        
+        nodes, distances= self.dijkstra(self.model.spaceLayers[spaceLayerID], cellSpaceFrom, cellSpaceTo)
 
         result = []
         for n in nodes:
