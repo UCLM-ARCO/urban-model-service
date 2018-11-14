@@ -9,7 +9,7 @@ Ice.loadSlice('../slice/UrbanService.ice')
 import UrbanService
 
 
-class AboutITSI(Ice.Application):
+class IgmlLayerExample(Ice.Application):
     def run(self, argv):
         self.spaceLayerID = 'TOPOLOGY'
         broker = Ice.initialize()
@@ -24,15 +24,12 @@ class AboutITSI(Ice.Application):
         proxy = broker.stringToProxy(strproxy)
         self.igmlLayer = UrbanService.IgmlLayerPrx.checkedCast(proxy)
 
-        self.retrievesInformationAboutBuilfing()
-
-        broker.destroy()
-
-    def retrievesInformationAboutBuilfing(self):
         random_cells_id = self.getRandomCellsIds()
         self.getInfoAboutCellFromId(random_cells_id[0])
         self.checkRelationBetweenCells(random_cells_id)
         self.calculatePathBetweenCells(random_cells_id)
+
+        broker.destroy()
 
     def getRandomCellsIds(self):
         cells = self.igmlLayer.getCells(self.spaceLayerID)
@@ -70,4 +67,4 @@ class AboutITSI(Ice.Application):
             print("No path between cells.")
 
 
-sys.exit(AboutITSI().main(sys.argv))
+sys.exit(IgmlLayerExample().main(sys.argv))
