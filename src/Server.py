@@ -189,10 +189,10 @@ class IgmlLayerI(UrbanService.IgmlLayer):
         cellSpaceFrom = self.model.getCellreference(CellIDfrom).duality
         cellSpaceTo = self.model.getCellreference(CellIDto).duality
 
-        # nodes = nx.dijkstra_path(
-        #     self.model.spaceLayers[spaceLayerID], cellSpaceFrom, cellSpaceTo)
+        nodes = nx.dijkstra_path(
+            self.model.spaceLayers[spaceLayerID], cellSpaceFrom, cellSpaceTo)
         
-        nodes, distances= self.dijkstra(self.model.spaceLayers[spaceLayerID], cellSpaceFrom, cellSpaceTo)
+        # nodes, distances= self.dijkstra(self.model.spaceLayers[spaceLayerID], cellSpaceFrom, cellSpaceTo)
 
         result = []
         for n in nodes:
