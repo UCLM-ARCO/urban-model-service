@@ -129,7 +129,7 @@ class IgmlLayerI(UrbanService.IgmlLayer):
     def getEntrances(self, spaceLayerID, current=None):
         entrances = []
         for cellSpace_id, cellSpace in self.model.CellSpaces.items():
-            if(cellSpace.usage == 'Entrance' and self.model.getLayerOfaCell(cellSpace_id) == spaceLayerID):
+            if(cellSpace.usage == 'Usage=Entrance' and self.model.getLayerOfaCell(cellSpace_id) == spaceLayerID):
                 entrances.append(cellSpace_id)
         return entrances
 
@@ -184,6 +184,18 @@ class IgmlLayerI(UrbanService.IgmlLayer):
         
         return path[::-1], distances[end]
 
+    def convertRoute(self, route):
+        result = []
+
+        for node in route:
+            interLayerConnection = self.model.InterLayerConnections.get(node)
+            if(interLayerConnection != None):
+                if interLayerConnection.replace("STATE_", "CELL_") not in result:
+                    result.append(interLayerConnection.replace("STATE_", "CELL_"))
+            else:
+                result.append(node.replace("STATE_", "CELL_"))
+
+        return result
 
     def getPathCellToCell(self, spaceLayerID, CellIDfrom, CellIDto, current=None):
         cellSpaceFrom = self.model.getCellreference(CellIDfrom).duality
@@ -194,12 +206,14 @@ class IgmlLayerI(UrbanService.IgmlLayer):
         
         # nodes, distances= self.dijkstra(self.model.spaceLayers[spaceLayerID], cellSpaceFrom, cellSpaceTo)
 
-        result = []
+        route = []
         for n in nodes:
-            result.append(
-                self.model.spaceLayers[spaceLayerID].nodes[n]['obj'].duality)
+            route.append(
+                self.model.spaceLayers[spaceLayerID].nodes[n]['obj'].id)
+        #         self.model.spaceLayers[spaceLayerID].nodes[n]['obj'].duality)
+        # return route
 
-        return result
+        return self.convertRoute(route)
 
     def getPathPositionToPosition(self, spaceLayerID, positionFrom, positionTo, current=None):
         cellIDfrom = self.getCellofPosition(spaceLayerID, positionFrom)

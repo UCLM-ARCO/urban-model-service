@@ -145,7 +145,7 @@ class IgmlTests(TestCase):
 
     def test_the_usage_of_a_cell(self):
         referenceCellID = "CELL_LABORATORY.11"
-        expected_response = "Room"
+        expected_response = "Usage=Room"
         response = self.igmlLayer.getUsage(referenceCellID)
         self.assertEqual(expected_response, response)
 

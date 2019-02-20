@@ -22,18 +22,35 @@ ns = {'indoorgml': 'http://www.opengis.net/indoorgml/1.0/core',
       'gml': 'http://www.opengis.net/gml/3.2',
       'CellSpaceBoundary': '{http://www.opengis.net/indoorgml/1.0/core}CellSpaceBoundary',
       'CellSpace': '{http://www.opengis.net/indoorgml/1.0/core}CellSpace',
+      'InterLayerConnection': '{http://www.opengis.net/indoorgml/1.0/core}InterLayerConnection',
       'SpaceLayer': '{http://www.opengis.net/indoorgml/1.0/core}SpaceLayer',
       'id': '{http://www.opengis.net/gml/3.2}id',
       'href': '{http://www.w3.org/1999/xlink}href'}
+
+surface_weighs = {'asphalt' : 1, 'grass' : 100, 'mud' : 1000}
 
 
 class IndoorGMLreader:
     def __init__(self, _file):
         self.file = _file
+        self.loadInterLayerConnections()
         self.loadCellSpaceBoundaries()
         self.loadCellSpaces()
         self.createKDTree()
         self.loadSpaceLayers()
+
+    def loadInterLayerConnections(self):
+        self.InterLayerConnections = {}
+        for (event, node) in etree.iterparse(self.file, events=['end'],
+                                             tag=ns['InterLayerConnection'],
+                                             huge_tree=True):
+
+            interConnects = node.findall('indoorgml:interConnects', ns)
+
+            state_1 = interConnects[0].attrib[ns['href']][1:]
+            state_2 = interConnects[1].attrib[ns['href']][1:]
+            self.InterLayerConnections[state_2] = state_1
+
 
     def loadCellSpaceBoundaries(self):
         self.cellSpaceBoundaries = {}
@@ -92,9 +109,11 @@ class IndoorGMLreader:
 
             cellSpace_usage = None
             if(node.find('gml:description', ns) is not None):
-                dirty_cellSpace_usage = node.find(
-                    'gml:description', ns).text
-                cellSpace_usage = re.split(':|=', dirty_cellSpace_usage)[1]
+                # dirty_cellSpace_usage = node.find(
+                #     'gml:description', ns).text
+                # cellSpace_usage = re.split(':|=', dirty_cellSpace_usage)[1]
+            
+                cellSpace_usage = node.find('gml:description', ns).text
 
             cellSpace_duality_node = node.find('indoorgml:duality', ns)
             cellSpace_duality = None
@@ -226,6 +245,29 @@ class IndoorGMLreader:
             state_ref_1 = connects[0].attrib[ns['href']][1:]
             state_ref_2 = connects[1].attrib[ns['href']][1:]
 
+            weight = 1
+            if(self.InterLayerConnections.get(state_ref_1) != None):
+                interLayerConnection = self.InterLayerConnections.get(state_ref_1)
+                cell = self.CellSpaces[interLayerConnection.replace("STATE_", "CELL_")]
+
+                for usage in re.split('/', cell.usage):
+                    if "surface" in usage:
+                        surface = re.split('=', usage)[1].strip()
+                        weight = surface_weighs[surface]
+                        break
+
+            if(self.InterLayerConnections.get(state_ref_2) != None):
+                interLayerConnection = self.InterLayerConnections.get(state_ref_2)
+                cell = self.CellSpaces[interLayerConnection.replace("STATE_", "CELL_")]
+
+                for usage in re.split('/', cell.usage):
+                    if "surface" in usage:
+                        surface = re.split('=', usage)[1].strip()
+
+                        if surface_weighs[surface] > weight:
+                            weight = surface_weighs[surface]
+                        break
+
             lineString = []
 
             for pos in transition_node.find('indoorgml:geometry', ns).find('gml:LineString', ns).findall('gml:pos', ns):
@@ -235,7 +277,8 @@ class IndoorGMLreader:
 
             transition = UrbanService.transition(
                 transition_id, transition_name, transition_weight, transition_duality, state_ref_1, state_ref_2, lineString)
-            graph.add_edge(state_ref_1, state_ref_2, obj=transition, weight=transition_weight)
+            graph.add_edge(state_ref_1, state_ref_2,
+                           obj=transition, weight=weight)
 
     def drawLayer(self, spaceLayer_id):
         nx.draw(self.spaceLayers[spaceLayer_id], with_labels=True)
