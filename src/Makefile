@@ -3,7 +3,8 @@
 
 # MODEL_FILE='../../itsi-indoorgml/model/ITSI.gml'
 OSM_FILE='../test/map.osm'
-MODEL_FILE='../../indoorgml-olc-models/models/case_of_use/outdoor-itis-IJGI.gml'
+# MODEL_FILE='../../indoorgml-olc-models/models/case_of_use/outdoor-itis-IJGI.gml'
+MODEL_FILE='../../indoorgml-olc-models/models/case_ITSI-Citisim/model.gml'
 
 all:
 
