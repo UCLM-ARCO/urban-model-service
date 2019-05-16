@@ -17,7 +17,7 @@ class IgmlTests(TestCase):
         self.spaceLayerID = 'TOPOLOGY'
 
         try:
-            with open('../src/IgmlLayer1.txt', 'r') as f:
+            with open('IgmlLayer1.txt', 'r') as f:
                 strproxy = f.readline()
         except IOError as error:
             print('Please, first start the service and then run again.')
@@ -185,7 +185,7 @@ class RoutingServiceTests(TestCase):
         self.addCleanup(broker.destroy)
 
         try:
-            with open('../src/RoutingService1.txt', 'r') as f:
+            with open('RoutingService1.txt', 'r') as f:
                 strproxy = f.readline()
         except IOError as error:
             print('Please, first start the service and then run again.')
