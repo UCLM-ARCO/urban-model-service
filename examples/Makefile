@@ -3,9 +3,10 @@
 
 
 PROJECT_DIR := $(shell get-project-dir)
-MODEL_FILE_ITSI_BUILDING='../../itsi-indoorgml/model/ITSI.gml'
-MODEL_FILE_CASE_PAPER='../../indoorgml-olc-models/models/case_of_use/outdoor-itis-IJGI.gml'
-MODEL_FILE_CASE_CITISIM='../../indoorgml-olc-models/models/case_ITSI-Citisim/outdoor-indoor-citisim.gml'
+MODEL_FILE_ITSI_BUILDING='../../itsi-indoorgml/final_models/ITSI.gml'
+MODEL_FILE_CASE_CITISIM='../../itsi-indoorgml/final_models/outdoor-indoor-citisim.gml'
+MODEL_FILE_CASE_PAPER='case_paper_example.gml'
+
 
 
 clean:
