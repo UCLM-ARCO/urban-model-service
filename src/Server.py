@@ -16,6 +16,10 @@ import openlocationcode as olc
 Ice.loadSlice('../slice/UrbanService.ice')
 import UrbanService
 
+from libcitisim import SmartServices
+# Ice.loadSlice('../../prj.citisim/slice/services.ice')
+# import SmartServices
+
 
 class IgmlLayerI(UrbanService.IgmlLayer):
     def __init__(self, model):
@@ -148,6 +152,15 @@ class IgmlLayerI(UrbanService.IgmlLayer):
                 return(value[1].contains(Point(point)))
 
 
+class RoutingServiceI(SmartServices.RoutingService):
+    def __init__(self, model):
+        self.model = model
+
+        if 'olc-layer' in  self.model.spaceLayers:
+            self.spaceLayerID = 'olc-layer'
+        else:
+            self.spaceLayerID = 'TOPOLOGY'
+
     def dijkstra(self, graph, start, end):
         distances = {} 
         predecessors = {} 
@@ -197,140 +210,23 @@ class IgmlLayerI(UrbanService.IgmlLayer):
 
         return result
 
-    def getPathCellToCell(self, spaceLayerID, CellIDfrom, CellIDto, current=None):
-        cellSpaceFrom = self.model.getCellreference(CellIDfrom).duality
-        cellSpaceTo = self.model.getCellreference(CellIDto).duality
+    def getPath(self, startPoint, endPoint, current=None):
+        cellSpaceFrom = self.model.getCellreference(startPoint).duality
+        cellSpaceTo = self.model.getCellreference(endPoint).duality
 
         nodes = nx.dijkstra_path(
-            self.model.spaceLayers[spaceLayerID], cellSpaceFrom, cellSpaceTo)
+            self.model.spaceLayers[self.spaceLayerID], cellSpaceFrom, cellSpaceTo)
         
-        # nodes, distances= self.dijkstra(self.model.spaceLayers[spaceLayerID], cellSpaceFrom, cellSpaceTo)
+        # nodes, distances= self.dijkstra(self.model.spaceLayers[self.spaceLayerID ], cellSpaceFrom, cellSpaceTo)
 
         route = []
         for n in nodes:
             route.append(
-                self.model.spaceLayers[spaceLayerID].nodes[n]['obj'].id)
-        #         self.model.spaceLayers[spaceLayerID].nodes[n]['obj'].duality)
+                self.model.spaceLayers[self.spaceLayerID].nodes[n]['obj'].id)
+        #         self.model.spaceLayers[self.spaceLayerID ].nodes[n]['obj'].duality)
         # return route
 
         return self.convertRoute(route)
-
-    def getPathPositionToPosition(self, spaceLayerID, positionFrom, positionTo, current=None):
-        cellIDfrom = self.getCellofPosition(spaceLayerID, positionFrom)
-        cellIDTo = self.getCellofPosition(spaceLayerID, positionTo)
-        return self.getPathCellToCell(spaceLayerID, cellIDfrom, cellIDTo)
-
-class GeoHashingI(UrbanService.GeoHashing):
-    def __init__(self, dataFile):
-        self.dataFile = dataFile
-        self.buildingsPolygon = {}
-        self.readOSM()
-
-    def readOSM(self, current=None):
-        tree = ET.parse(self.dataFile)
-
-        for way in tree.iterfind('way'):
-            if way.find('tag[@k="building"]') is not None and way.find('tag[@k="name"]') is not None:
-                points = []
-                name = (way.find('tag[@k="name"]').attrib['v'])
-
-                for nd in way.iterfind('nd'):
-                    ref = nd.attrib['ref']
-                    node = tree.find("node" + "[@id='" + ref +"']")
-                    
-                    lat = node.attrib['lat']
-                    lon = node.attrib['lon']
-                    points.append([float(lat), float(lon)])
-
-                self.buildingsPolygon[name] = Polygon(points)
-
-    def encode(self, position, codeLength, current=None):
-        return olc.encode(position.x, position.y, codeLength)
-
-    def decode(self, code, current=None):
-        result = olc.decode(code)
-        return UrbanService.CodeArea(
-            result.latitudeLo, result.longitudeLo,                            result.latitudeHi, result.longitudeHi,                           result.codeLength, result.latitudeCenter,                        result.longitudeCenter)
-
-    def isValid(self, code, current=None):
-        return olc.isValid(code)
-
-    def getNeighbourCodeAreas(self, code, current=None):
-        codeArea = self.decode(code)
-        centerOfArea = [codeArea.latitudeCenter, codeArea.longitudeCenter]
-
-        longitudeOffset = (1.0/32000)
-        latitudeOffset = (1.0/40000)
-
-        rightCenter = self.encode(
-            UrbanService.position3D(
-                centerOfArea[0], 
-                centerOfArea[1] + longitudeOffset), 
-            11)
-
-        leftCenter = self.encode(
-            UrbanService.position3D(
-                centerOfArea[0], 
-                centerOfArea[1] - longitudeOffset), 
-            11)
-
-
-        upCenter = self.encode(
-            UrbanService.position3D(
-                centerOfArea[0] + latitudeOffset, 
-                centerOfArea[1]), 
-            11)
-
-        downCenter = self.encode(
-            UrbanService.position3D(
-                centerOfArea[0] - latitudeOffset, 
-                centerOfArea[1]), 
-            11)
-
-
-        return [rightCenter, leftCenter, upCenter, downCenter]
-
-    def getPolygonOpenLocationCode(self, code, current=None):
-        codeArea = self.decode(code)
-        return Polygon([ [codeArea.latitudeLo,codeArea.longitudeLo],      
-                            [codeArea.latitudeHi, codeArea.longitudeLo], [codeArea.latitudeHi,codeArea.longitudeHi], [codeArea.latitudeLo, codeArea.longitudeHi],
-                            [codeArea.latitudeLo,codeArea.longitudeLo] ])
-
-    def getCellsOfBuilding(self, buildingPolygon, current=None):
-        proccesedOpenLocationCode = []
-        result = []
-
-        initialOpenLocationCode = self.encode(
-            UrbanService.position3D(buildingPolygon.centroid.x,       
-                                    buildingPolygon.centroid.y), 
-            11)
-
-        queue = [initialOpenLocationCode] + self.getNeighbourCodeAreas(initialOpenLocationCode)
-
-        while queue:
-            openLocationCode = queue.pop(0)
-            proccesedOpenLocationCode.append(openLocationCode)
-
-            if buildingPolygon.intersects(self.getPolygonOpenLocationCode(openLocationCode)):
-                result.append(openLocationCode)
-            else:
-                continue
-
-            neighbours = self.getNeighbourCodeAreas(openLocationCode)
-
-            for neighbour in neighbours:
-                if neighbour not in proccesedOpenLocationCode and neighbour not in queue:
-                    queue.append(neighbour)
-
-        return result
-
-    def getBuilding(self, name, current=None):
-        openLocationCodes = self.getCellsOfBuilding(self.buildingsPolygon[name])
-        buildingUUID = uuid.uuid3(
-            uuid.NAMESPACE_DNS, 
-            "".join(openLocationCodes))
-
-        return UrbanService.building(name, str(buildingUUID), openLocationCodes)
 
 class Server(Ice.Application):
     def __init__(self):
@@ -346,11 +242,11 @@ class Server(Ice.Application):
         self.create_proxy_file("IgmlLayer1", proxy)
         print(proxy)
 
-        servant = GeoHashingI(sys.argv[2])
-        adapter = broker.createObjectAdapter("GeoHashingAdapter")
-        proxy = adapter.add(servant, broker.stringToIdentity("GeoHashing1"))
+        servant = RoutingServiceI(self.model)
+        adapter = broker.createObjectAdapter("RoutingServiceAdapter")
+        proxy = adapter.add(servant, broker.stringToIdentity("RoutingService1"))
         adapter.activate()
-        self.create_proxy_file("GeoHashing1", proxy)
+        self.create_proxy_file("RoutingService1", proxy)
         print(proxy)
 
         self.shutdownOnInterrupt()

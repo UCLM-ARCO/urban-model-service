@@ -109,22 +109,4 @@ module UrbanService{
     IDsequence getSpaceLayersID();
   };
 
-  // State: PROPOSAL
-  interface GeoHashing{
-    string encode(position3D position, int codeLength);
-    CodeArea decode(string code);
-    bool isValid(string code);
-    building getBuilding(string name);
-  };
-    
-  // State: PROPOSAL
-  //struct georef{
-  //  string pluscode;
-  //  string placecode;
-  //};
-
-  //interface GeoHashingService{
-  //  string getPlusCode(position3D position);
-  //  georef getGeoRef(position3D position);
-  //};
 };

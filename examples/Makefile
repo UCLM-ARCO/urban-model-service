@@ -4,5 +4,8 @@
 clean:
 	$(RM) -rf __pycache__
 
-run-aboutITSI:
-	./aboutITSI.py
+run-CaseCITISIM:
+	./RoutingServiceClientCITISIM.py
+
+run-IgmlLayerClient:
+	./IgmlLayerClient.py
