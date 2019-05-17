@@ -17,8 +17,6 @@ Ice.loadSlice('../slice/UrbanService.ice')
 import UrbanService
 
 from libcitisim import SmartServices
-# Ice.loadSlice('../../prj.citisim/slice/services.ice')
-# import SmartServices
 
 
 class IgmlLayerI(UrbanService.IgmlLayer):

@@ -2,7 +2,7 @@
 # -*- mode:makefile -*-
 
 PROJECT_DIR := $(shell get-project-dir)
-MODEL_FILE_ITSI_BUILDING='../../itsi-indoorgml/model/ITSI.gml'
+MODEL_FILE_ITSI_BUILDING='../../itsi-indoorgml/final_models/ITSI.gml'
 
 clean:
 	$(RM) *~ *.txt
