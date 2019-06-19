@@ -31,8 +31,9 @@ surface_weighs = {'asphalt' : 1, 'grass' : 100, 'mud' : 1000}
 
 
 class IndoorGMLreader:
-    def __init__(self, _file):
+    def __init__(self, _file, fixed_weight = True):
         self.file = _file
+        self.fixed_weight = fixed_weight
         self.loadInterLayerConnections()
         self.loadCellSpaceBoundaries()
         self.loadCellSpaces()
@@ -112,7 +113,7 @@ class IndoorGMLreader:
                 # dirty_cellSpace_usage = node.find(
                 #     'gml:description', ns).text
                 # cellSpace_usage = re.split(':|=', dirty_cellSpace_usage)[1]
-            
+
                 cellSpace_usage = node.find('gml:description', ns).text
 
             cellSpace_duality_node = node.find('indoorgml:duality', ns)
@@ -246,27 +247,28 @@ class IndoorGMLreader:
             state_ref_2 = connects[1].attrib[ns['href']][1:]
 
             weight = 1
-            if(self.InterLayerConnections.get(state_ref_1) != None):
-                interLayerConnection = self.InterLayerConnections.get(state_ref_1)
-                cell = self.CellSpaces[interLayerConnection.replace("STATE_", "CELL_")]
+            if(self.fixed_weight == False):
+                if(self.InterLayerConnections.get(state_ref_1) != None):
+                    interLayerConnection = self.InterLayerConnections.get(state_ref_1)
+                    cell = self.CellSpaces[interLayerConnection.replace("STATE_", "CELL_")]
 
-                for usage in re.split('/', cell.usage):
-                    if "surface" in usage:
-                        surface = re.split('=', usage)[1].strip()
-                        weight = surface_weighs[surface]
-                        break
-
-            if(self.InterLayerConnections.get(state_ref_2) != None):
-                interLayerConnection = self.InterLayerConnections.get(state_ref_2)
-                cell = self.CellSpaces[interLayerConnection.replace("STATE_", "CELL_")]
-
-                for usage in re.split('/', cell.usage):
-                    if "surface" in usage:
-                        surface = re.split('=', usage)[1].strip()
-
-                        if surface_weighs[surface] > weight:
+                    for usage in re.split('/', cell.usage):
+                        if "surface" in usage:
+                            surface = re.split('=', usage)[1].strip()
                             weight = surface_weighs[surface]
-                        break
+                            break
+
+                if(self.InterLayerConnections.get(state_ref_2) != None):
+                    interLayerConnection = self.InterLayerConnections.get(state_ref_2)
+                    cell = self.CellSpaces[interLayerConnection.replace("STATE_", "CELL_")]
+
+                    for usage in re.split('/', cell.usage):
+                        if "surface" in usage:
+                            surface = re.split('=', usage)[1].strip()
+
+                            if surface_weighs[surface] > weight:
+                                weight = surface_weighs[surface]
+                            break
 
             lineString = []
 

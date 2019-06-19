@@ -68557,7 +68557,7 @@
       </cellSpaceMember>
       <cellSpaceMember>
         <CellSpace gml:id="CELL_wall_2">
-          <gml:description>barrier=wall </gml:description>
+          <gml:description>barrier=wall</gml:description>
           <gml:name>CELL_wall_2</gml:name>
           <gml:boundedBy xsi:nil="true"/>
           <Geometry3D>
@@ -68696,7 +68696,7 @@
       </cellSpaceMember>
       <cellSpaceMember>
         <CellSpace gml:id="CELL_wall_1">
-          <gml:description>barrier=wall </gml:description>
+          <gml:description>barrier=wall</gml:description>
           <gml:name>CELL_wall_1</gml:name>
           <gml:boundedBy xsi:nil="true"/>
           <Geometry3D>
@@ -68914,7 +68914,7 @@
       </cellSpaceMember>
       <cellSpaceMember>
         <CellSpace gml:id="CELL_wall_3">
-          <gml:description>barrier=wall </gml:description>
+          <gml:description>barrier=wall</gml:description>
           <gml:name>CELL_wall_3</gml:name>
           <gml:boundedBy xsi:nil="true"/>
           <Geometry3D>
