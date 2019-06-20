@@ -82,16 +82,22 @@ def run_tests(option):
         spaceLayerID = 'TOPOLOGY'
 
     test_number = 10
+    repetitions_number = 100
     random_cells_id = getRandomCellsIds(test_number, model, spaceLayerID)
     print(random_cells_id)
 
     for i in range(test_number):
         print('Calculating route...')
-        start = time.time()
-        getPath(random_cells_id[0][i], random_cells_id[1][i], model, spaceLayerID)
-        end = time.time()
+        accumulated_time = 0
 
-        times.append(end - start)
+        for j in range(repetitions_number):
+            start = time.time()
+            getPath(random_cells_id[0][i], random_cells_id[1][i], model, spaceLayerID)
+            end = time.time()
+            accumulated_time += end - start
+
+        average_time = accumulated_time / repetitions_number 
+        times.append(average_time)
 
     return times
 
@@ -101,8 +107,6 @@ times_with_surfacers = run_tests(True)
 
 print(times_not_surfaces)
 print(times_with_surfacers)
-
-
 
 ind = np.arange(len(times_not_surfaces))  # the x locations for the groups
 width = 0.35  # the width of the bars
@@ -114,10 +118,11 @@ rects2 = ax.bar(ind + width/2, times_with_surfacers, width,
                 label='With Surfaces')
 
 # Add some text for labels, title and custom x-axis tick labels, etc.
-ax.set_ylabel('Scores')
-ax.set_title('Scores by group and gender')
-ax.set_xticks(ind)
-ax.set_xticklabels(('G1', 'G2', 'G3', 'G4', 'G5'))
+ax.set_ylabel('Execution time (ms)')
+ax.set_xlabel('Tests')
+# ax.set_title('Scores by group and gender')
+# ax.set_xticks(ind)
+# ax.set_xticklabels(('Test 1', 'Test 2', 'Test 3', 'Test 4', 'Test 5', 'Test 6', 'Test 7', 'Test 8', 'Test 9', 'Test 10'))
 ax.legend()
 
 fig.tight_layout()
