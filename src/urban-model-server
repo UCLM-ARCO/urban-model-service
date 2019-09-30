@@ -227,7 +227,8 @@ class RoutingServiceI(SmartServices.RoutingService):
         route = []
         for n in nodes:
             route.append(
-                self.model.spaceLayers[self.spaceLayerID].nodes[n]['obj'].id)
+                self.model.spaceLayers[self.spaceLayerID].nodes[n]['obj'].id
+            )
         #         self.model.spaceLayers[self.spaceLayerID ].nodes[n]['obj'].duality)
         # return route
 
@@ -239,6 +240,7 @@ class Server(Ice.Application):
         if not self.parse_args(args):
             return -1
 
+        logging.info("Loading model...")
         self.model = IndoorGMLreader(self.args.model)
         ic = self.communicator()
 

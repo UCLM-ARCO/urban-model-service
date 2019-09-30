@@ -327,7 +327,7 @@ class IndoorGMLreader:
         if cellID in self.CellSpaces:
             return self.CellSpaces[cellID]
         else:
-            raise Exception('Invalid cellID')
+            raise Exception('Invalid cellID ({})'.format(cellID))
 
     def getLayerOfaCell(self, cellID):
         cellSpace = self.getCellreference(cellID)
