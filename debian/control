@@ -13,6 +13,7 @@ Depends:
  python3-networkx,
  python3-shapely,
  python3-lxml,
+ python3-matplotlib,
  libcitisim
 Description: Services that allow queries about a model based on the IndoorGML standard
  This package provides various services. On the one hand there is the one in
