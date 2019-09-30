@@ -16,6 +16,8 @@ class IgmlTests(TestCase):
         self.addCleanup(broker.destroy)
         self.spaceLayerID = 'TOPOLOGY'
 
+        # FIXME: use a known proxy for testing
+        # do not include testing related code on server!!
         try:
             with open('IgmlLayer1.txt', 'r') as f:
                 strproxy = f.readline()
@@ -184,6 +186,8 @@ class RoutingServiceTests(TestCase):
         broker = Ice.initialize()
         self.addCleanup(broker.destroy)
 
+        # FIXME: use a known proxy for testing
+        # do not include testing related code on server!!
         try:
             with open('RoutingService1.txt', 'r') as f:
                 strproxy = f.readline()
