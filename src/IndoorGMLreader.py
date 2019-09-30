@@ -1,6 +1,7 @@
 #!/usr/bin/python3 -u
 # -*- coding: utf-8 -*-
 
+import os
 import sys
 import re
 import networkx as nx
@@ -14,7 +15,12 @@ from shapely.geometry import Point
 from scipy.spatial import KDTree
 
 import Ice
-Ice.loadSlice('../slice/UrbanService.ice')
+
+slice_path = os.path.join(os.path.dirname(__file__), "../slice/UrbanService.ice")
+if not os.path.exists(slice_path):
+    slice_path = "/usr/share/slice/urban-model/UrbanService.ice"
+Ice.loadSlice(slice_path)
+
 import UrbanService
 
 

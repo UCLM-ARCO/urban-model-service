@@ -1,0 +1,23 @@
+Source: urban-model-server
+Section: utils
+Priority: optional
+Maintainer: Oscar Aceña Herrera <oscaracena@gmail.com>
+Build-Depends: debhelper (>= 7.0.50~), python3
+Standards-Version: 4.1.4
+
+Package: urban-model-server
+Architecture: all
+Depends:
+ ${misc:Depends},
+ python3,
+ python3-networkx,
+ python3-shapely,
+ python3-lxml,
+ libcitisim
+Description: Services that allow queries about a model based on the IndoorGML standard
+ This package provides various services. On the one hand there is the one in
+ charge of serving the IndoorGML model indicated to the server through the
+ "IgmlLayer" interface. On the other hand there is the service in charge of
+ calculating routes between two points of the model and implements the
+ interface "RoutingService" of the "SmartServices" module of the libcitisim
+ package.
