@@ -12,23 +12,17 @@ import UrbanService
 class IgmlLayerClient(Ice.Application):
     def run(self, argv):
         self.spaceLayerID = 'TOPOLOGY'
-        broker = Ice.initialize()
+        ic = self.communicator()
 
-        try:
-            with open('IgmlLayer1.txt', 'r') as f:
-                strproxy = f.readline()
-        except IOError:
-            print('Please, first start the service and then run again.')
-            exit(1)
-
-        proxy = broker.stringToProxy(strproxy)
+        proxy = "IgmlLayer -t:tcp -h 127.0.0.1 -p 9093"
+        proxy = ic.stringToProxy(proxy)
         self.igmlLayer = UrbanService.IgmlLayerPrx.checkedCast(proxy)
 
         random_cells_id = self.getRandomCellsIds()
         self.getInfoAboutCellFromId(random_cells_id[0])
         self.checkRelationBetweenCells(random_cells_id)
 
-        broker.destroy()
+        ic.destroy()
 
     def getRandomCellsIds(self):
         cells = self.igmlLayer.getCells(self.spaceLayerID)
