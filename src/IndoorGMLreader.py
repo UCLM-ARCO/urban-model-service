@@ -37,7 +37,7 @@ surface_weighs = {'asphalt' : 1, 'grass' : 100, 'mud' : 1000}
 
 
 class IndoorGMLreader:
-    def __init__(self, _file, fixed_weight = True):
+    def __init__(self, _file, fixed_weight = False):
         self.file = _file
         self.fixed_weight = fixed_weight
         self.loadInterLayerConnections()
