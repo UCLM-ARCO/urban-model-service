@@ -208,7 +208,7 @@ class RoutingServiceI(SmartServices.RoutingService):
         for node in route:
             interLayerConnection = self.model.InterLayerConnections.get(node)
             if(interLayerConnection != None):
-                if interLayerConnection.replace("STATE_", "CELL_") not in result:
+                if interLayerConnection.replace("STATE_", "CELL_") != result[-1]:
                     result.append(interLayerConnection.replace("STATE_", "CELL_"))
             else:
                 result.append(node.replace("STATE_", "CELL_"))
@@ -230,9 +230,9 @@ class RoutingServiceI(SmartServices.RoutingService):
                 self.model.spaceLayers[self.spaceLayerID].nodes[n]['obj'].id
             )
         #         self.model.spaceLayers[self.spaceLayerID ].nodes[n]['obj'].duality)
-        # return route
+        return route
 
-        return self.convertRoute(route)
+        # return self.convertRoute(route)
 
 
 class Server(Ice.Application):
