@@ -23,12 +23,10 @@ run-server-case-citisim:
 	$(PROJECT_DIR)/src/urban-model-server $(MODEL_FILE_CASE_CITISIM) --Ice.Config=Server.config
 
 run-CaseCITISIM:
-	./RoutingServiceClientCITISIM.py
+	./RoutingServiceClientCITISIM.py --Ice.Config=RoutingServiceClientCITISIM.config
 
 run-server-case-paper:
 	$(PROJECT_DIR)/src/urban-model-server $(MODEL_FILE_CASE_PAPER) --Ice.Config=Server.config
 
 run-server-tfm-ana:
 	$(PROJECT_DIR)/src/urban-model-server '../../tfm.ana.rubio/case-of-use/model.gml' --Ice.Config=Server.config
-
-

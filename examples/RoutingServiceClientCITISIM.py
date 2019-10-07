@@ -12,7 +12,10 @@ class RoutingServiceClientCITISIM(Ice.Application):
     def run(self, argv):
         ic = self.communicator()
 
-        proxy = "RoutingService -t:tcp -h 127.0.0.1 -p 9093"
+        # Local proxy
+        # proxy = "RoutingService -t:tcp -h 127.0.0.1 -p 9093"
+        proxy = "RoutingService"
+
         proxy = ic.stringToProxy(proxy)
         self.routingServicePrx = SmartServices.RoutingServicePrx.checkedCast(proxy)
         self.calculatePathBetweenCells()
