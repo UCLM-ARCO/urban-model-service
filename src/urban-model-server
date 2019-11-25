@@ -227,7 +227,8 @@ class RoutingServiceI(SmartServices.RoutingService):
         route = []
         for n in nodes:
             route.append(
-                self.model.spaceLayers[self.spaceLayerID].nodes[n]['obj'].id
+                # self.model.spaceLayers[self.spaceLayerID].nodes[n]['obj'].id
+                self.model.spaceLayers[self.spaceLayerID].nodes[n]['obj'].id.replace("STATE_", "CELL_")
             )
         #         self.model.spaceLayers[self.spaceLayerID ].nodes[n]['obj'].duality)
         return route
