@@ -1,3 +1,9 @@
+urban-model-server (0.20191125-1) unstable; urgency=low
+
+  * New release; STATE_ -> CELL_
+
+ -- Oscar Aceña Herrera <oscaracena@gmail.com>  Mon, 25 Nov 2019 14:01:01 +0100
+
 urban-model-server (0.20191122-1) unstable; urgency=low
 
   * New release
